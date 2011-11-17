@@ -3,6 +3,10 @@
 # Licensed under the terms in README.h
 # Chip Overclock <coverclock@diag.com>
 # http://www.diag.com/navigation/downloads/Desperadito
+# This project is a subset of the much larger core project.
+# http://www.diag.com/navigation/downloads/Desperado
+# The source files are derived directly and unaltered from the core project.
+# The core project contains the unit tests.
 ################################################################################
 
 PROJECT=desperadito
@@ -63,18 +67,126 @@ PHONY+=default
 default:	all
 
 ################################################################################
+# MANIFEST
+################################################################################
+
+MANIFEST_H=\
+ Begin.h \
+ BufferInput.h \
+ BufferOutput.h \
+ CommonEra.h \
+ Constant.h \
+ DataInput.h \
+ Date.h \
+ DateTime.h \
+ DaylightSavingTime.h \
+ DescriptorInput.h \
+ DescriptorOutput.h \
+ Dump.h \
+ End.h \
+ Epoch.h \
+ FileInput.h \
+ FileOutput.h \
+ Heap.h \
+ Input.h \
+ InputOutput.h \
+ LeapSeconds.h \
+ Linux.h \
+ LogOutput.h \
+ Logger.h \
+ Number.h \
+ Object.h \
+ Output.h \
+ PathInput.h \
+ PathOutput.h \
+ Platform.h \
+ Print.h \
+ SyslogOutput.h \
+ Time.h \
+ TimeZone.h \
+ Vintage.h \
+ cxxcapi.h \
+ errno.h \
+ generics.h \
+ ready.h \
+ release.h \
+ stdarg.h \
+ stdio.h \
+ stdlib.h \
+ string.h \
+ target.h \
+ types.h \
+ int8_Number.h \
+ int16_Number.h \
+ int32_Number.h \
+ int64_Number.h \
+ uint8_Number.h \
+ uint16_Number.h \
+ uint32_Number.h \
+ uint64_Number.h
+
+MANIFEST_CPP=\
+ BufferInput.cpp \
+ BufferOutput.cpp \
+ CommonEra.cpp \
+ DataInput.cpp \
+ Date.cpp \
+ DateTime.cpp \
+ DaylightSavingTime.cpp \
+ DescriptorInput.cpp \
+ DescriptorOutput.cpp \
+ Dump.cpp \
+ Epoch.cpp \
+ FileInput.cpp \
+ FileOutput.cpp \
+ Heap.cpp \
+ Input.cpp \
+ InputOutput.cpp \
+ LeapSeconds.cpp \
+ Linux.cpp \
+ LogOutput.cpp \
+ Logger.cpp \
+ Object.cpp \
+ Output.cpp \
+ PathInput.cpp \
+ PathOutput.cpp \
+ Platform.cpp \
+ Print.cpp \
+ SyslogOutput.cpp \
+ Time.cpp \
+ TimeZone.cpp \
+ Vintage.cpp \
+ ready.cpp \
+ string.cpp \
+ int8_Number.cpp \
+ int16_Number.cpp \
+ int32_Number.cpp \
+ int64_Number.cpp \
+ uint8_Number.cpp \
+ uint16_Number.cpp \
+ uint32_Number.cpp \
+ uint64_Number.cpp
+
+################################################################################
+# EXTRACTION
+################################################################################
+
+CORE=Desperado
+CORELC=desperado
+
+CORE_DIR=$(shell cd ../$(CORE); pwd)
+
+extract:
+	( cd ${CORE_DIR}/include/com/diag/$(CORELC); ls -l $(MANIFEST_H) )
+	( cd ${CORE_DIR}; ls -l $(MANIFEST_CPP) )
+
+################################################################################
 # BUILD
 ################################################################################
 
 TARGETS+=
 ARTIFACTS+=
 ARCHIVABLE+=
-
-TARGETS+=unittest
-ARTIFACTS+=unittest
-
-unittest:	unittest.o $(PROJECT_LIB) $(LARIAT_LIB) $(GMOCK_LIB) $(GTEST_LIB) $(DESPERADO_LIB) $(S3_LIB) $(XML2_LIB) $(CURL_LIB) $(OPENSSL_LIB) $(CRYPTO_LIB)
-	$(CXX) -o unittest unittest.o $(LDFLAGS)
 
 ################################################################################
 # LIBRARIES AND SHARED OBJECTS
