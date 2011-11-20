@@ -19,6 +19,10 @@ HTTP_URL=http://www.diag.com/navigation/downloads/Desperadito.html
 
 TMP=/tmp
 
+CORE=Desperado
+CORELC=desperado
+FROM_DIR=$(shell cd ../$(CORE); pwd)
+
 ################################################################################
 # LISTS
 ################################################################################
@@ -43,7 +47,7 @@ PROJECT_LIB=lib$(PROJECT).so
 PROJECT_INC=include
 
 PROJECT_CPPFLAGS=-I$(PROJECT_INC)
-PROJECT_LDFLAGS=-L$(PROJECT_LIBS) -ldesperadito
+PROJECT_LDFLAGS=-L$(PROJECT_LIBS) -l$(PROJECT)
 
 CC=gcc
 CXX=g++
@@ -67,63 +71,66 @@ PHONY+=default
 default:	all
 
 ################################################################################
-# MANIFEST
+# MANIFESTS
 ################################################################################
 
 MANIFEST_H=\
- Begin.h \
- BufferInput.h \
- BufferOutput.h \
- CommonEra.h \
- Constant.h \
- DataInput.h \
- Date.h \
- DateTime.h \
- DaylightSavingTime.h \
- DescriptorInput.h \
- DescriptorOutput.h \
- Dump.h \
- End.h \
- Epoch.h \
- FileInput.h \
- FileOutput.h \
- Heap.h \
- Input.h \
- InputOutput.h \
- LeapSeconds.h \
- Linux.h \
- LogOutput.h \
- Logger.h \
- Number.h \
- Object.h \
- Output.h \
- PathInput.h \
- PathOutput.h \
- Platform.h \
- Print.h \
- SyslogOutput.h \
- Time.h \
- TimeZone.h \
- Vintage.h \
- cxxcapi.h \
- errno.h \
- generics.h \
- ready.h \
- release.h \
- stdarg.h \
- stdio.h \
- stdlib.h \
- string.h \
- target.h \
- types.h \
- int8_Number.h \
- int16_Number.h \
- int32_Number.h \
- int64_Number.h \
- uint8_Number.h \
- uint16_Number.h \
- uint32_Number.h \
- uint64_Number.h
+ include/com/diag/desperado/Begin.h \
+ include/com/diag/desperado/BufferInput.h \
+ include/com/diag/desperado/BufferOutput.h \
+ include/com/diag/desperado/CommonEra.h \
+ include/com/diag/desperado/Constant.h \
+ include/com/diag/desperado/DataInput.h \
+ include/com/diag/desperado/Date.h \
+ include/com/diag/desperado/DateTime.h \
+ include/com/diag/desperado/DaylightSavingTime.h \
+ include/com/diag/desperado/DescriptorInput.h \
+ include/com/diag/desperado/DescriptorOutput.h \
+ include/com/diag/desperado/Dump.h \
+ include/com/diag/desperado/DumpInput.h \
+ include/com/diag/desperado/DumpOutput.h \
+ include/com/diag/desperado/End.h \
+ include/com/diag/desperado/Epoch.h \
+ include/com/diag/desperado/FileInput.h \
+ include/com/diag/desperado/FileOutput.h \
+ include/com/diag/desperado/Heap.h \
+ include/com/diag/desperado/Input.h \
+ include/com/diag/desperado/InputOutput.h \
+ include/com/diag/desperado/LeapSeconds.h \
+ include/com/diag/desperado/Linux.h \
+ include/com/diag/desperado/LogOutput.h \
+ include/com/diag/desperado/Logger.h \
+ include/com/diag/desperado/Number.h \
+ include/com/diag/desperado/Object.h \
+ include/com/diag/desperado/Output.h \
+ include/com/diag/desperado/PathInput.h \
+ include/com/diag/desperado/PathOutput.h \
+ include/com/diag/desperado/Platform.h \
+ include/com/diag/desperado/Print.h \
+ include/com/diag/desperado/SyslogOutput.h \
+ include/com/diag/desperado/Time.h \
+ include/com/diag/desperado/TimeZone.h \
+ include/com/diag/desperado/Vintage.h \
+ include/com/diag/desperado/cxxcapi.h \
+ include/com/diag/desperado/errno.h \
+ include/com/diag/desperado/generics.h \
+ include/com/diag/desperado/ready.h \
+ include/com/diag/desperado/release.h \
+ include/com/diag/desperado/stdarg.h \
+ include/com/diag/desperado/stdio.h \
+ include/com/diag/desperado/stdlib.h \
+ include/com/diag/desperado/string.h \
+ include/com/diag/desperado/target.h \
+ include/com/diag/desperado/types.h \
+ include/com/diag/desperado/int8_Number.h \
+ include/com/diag/desperado/int16_Number.h \
+ include/com/diag/desperado/int32_Number.h \
+ include/com/diag/desperado/int64_Number.h \
+ include/com/diag/desperado/uint8_Number.h \
+ include/com/diag/desperado/uint16_Number.h \
+ include/com/diag/desperado/uint32_Number.h \
+ include/com/diag/desperado/uint64_Number.h \
+ README.h
 
 MANIFEST_CPP=\
  BufferInput.cpp \
@@ -136,6 +143,8 @@ MANIFEST_CPP=\
  DescriptorInput.cpp \
  DescriptorOutput.cpp \
  Dump.cpp \
+ DumpInput.cpp \
+ DumpOutput.cpp \
  Epoch.cpp \
  FileInput.cpp \
  FileOutput.cpp \
@@ -146,6 +155,14 @@ MANIFEST_CPP=\
  Linux.cpp \
  LogOutput.cpp \
  Logger.cpp \
+ Number_int8.cpp \
+ Number_int16.cpp \
+ Number_int32.cpp \
+ Number_int64.cpp \
+ Number_uint8.cpp \
+ Number_uint16.cpp \
+ Number_uint32.cpp \
+ Number_uint64.cpp \
  Object.cpp \
  Output.cpp \
  PathInput.cpp \
@@ -166,27 +183,20 @@ MANIFEST_CPP=\
  uint16_Number.cpp \
  uint32_Number.cpp \
  uint64_Number.cpp
-
-################################################################################
-# EXTRACTION
-################################################################################
-
-CORE=Desperado
-CORELC=desperado
-
-CORE_DIR=$(shell cd ../$(CORE); pwd)
-
-extract:
-	( cd ${CORE_DIR}/include/com/diag/$(CORELC); ls -l $(MANIFEST_H) )
-	( cd ${CORE_DIR}; ls -l $(MANIFEST_CPP) )
+	
+MANIFEST_O=$(addsuffix .o,$(basename $(MANIFEST_CPP)))
 
 ################################################################################
 # BUILD
 ################################################################################
 
-TARGETS+=
-ARTIFACTS+=
-ARCHIVABLE+=
+TARGETS+=$(MANIFEST_H)
+
+TARGETS+=$(MANIFEST_CPP)
+
+TARGETS+=$(MANIFEST_O)
+ARTIFACTS+=$(MANIFEST_O)
+ARCHIVABLE+=$(MANIFEST_O)
 
 ################################################################################
 # LIBRARIES AND SHARED OBJECTS
@@ -223,16 +233,6 @@ lib$(PROJECT).so:	lib$(PROJECT).so.$(MAJOR)
 	ln -s -f lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD) lib$(PROJECT).so
 
 ################################################################################
-# UNIT TESTS
-################################################################################
-
-PHONY+=test
-
-test:	unittest
-	./unittest
-	echo "PASSED all"
-
-################################################################################
 # PATTERNS
 ################################################################################
 
@@ -250,6 +250,15 @@ test:	unittest
 
 %:	%_unstripped
 	$(STRIP) -o $@ $<
+	
+include/com/diag/$(CORELC)/%.h:	$(CORE_DIR)/include/com/diag/$(CORELC)/%.h
+	cp $< $@
+	
+%.cpp:	$(CORE_DIR)/%.cpp
+	cp $< $@
+
+%.c:	$(CORE_DIR)/%.c
+	cp $< $@
 
 ################################################################################
 # DEPENCENDIES
