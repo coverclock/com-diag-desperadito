@@ -19,9 +19,12 @@ HTTP_URL=http://www.diag.com/navigation/downloads/Desperadito.html
 
 TMP=/tmp
 
+PLATFORM=Linux
+TARGET=IA32
+
 CORE=Desperado
 CORELC=desperado
-FROM_DIR=$(shell cd ../$(CORE); pwd)
+CORE_DIR=$(shell cd ../$(CORE); pwd)
 
 ################################################################################
 # LISTS
@@ -46,7 +49,17 @@ PROJECT_LIBS=.
 PROJECT_LIB=lib$(PROJECT).so
 PROJECT_INC=include
 
-PROJECT_CPPFLAGS=-I$(PROJECT_INC)
+PROJECT_CDEFINES=\
+ -DDESPERADO_TARGET_IS_$(TARGET) \
+ -DDESPERADO_TARGET_NAME="\"$(TARGET)\"" \
+ -DDESPERADO_PLATFORM_IS_$(PLATFORM) \
+ -DDESPERADO_PLATFORM_NAME="\"$(PLATFORM)\""  \
+ -DDESPERADO_PLATFORM_CLASS=$(PLATFORM) \
+ -DDESPERADO_HAS_SYSLOG \
+ -D_REENTRANT \
+ -D_GNU_SOURCE
+
+PROJECT_CPPFLAGS=-I$(PROJECT_INC) $(PROJECT_CDEFINES)
 PROJECT_LDFLAGS=-L$(PROJECT_LIBS) -l$(PROJECT)
 
 CC=gcc
@@ -70,6 +83,12 @@ PHONY+=default
 
 default:	all
 
+include/com/diag/$(CORELC):
+	mkdir -p $@
+	
+desperado:
+	mkdir -p $@
+
 ################################################################################
 # MANIFESTS
 ################################################################################
@@ -86,11 +105,21 @@ MANIFEST_H=\
  include/com/diag/desperado/DaylightSavingTime.h \
  include/com/diag/desperado/DescriptorInput.h \
  include/com/diag/desperado/DescriptorOutput.h \
+ include/com/diag/desperado/Desperado.h \
+ include/com/diag/desperado/DstAlways.h \
+ include/com/diag/desperado/DstEu.h \
+ include/com/diag/desperado/DstGeneric.h \
+ include/com/diag/desperado/DstNever.h \
+ include/com/diag/desperado/DstUs.h \
+ include/com/diag/desperado/DstUs1966.h \
+ include/com/diag/desperado/DstUs1986.h \
+ include/com/diag/desperado/DstUs2007.h \
  include/com/diag/desperado/Dump.h \
  include/com/diag/desperado/DumpInput.h \
  include/com/diag/desperado/DumpOutput.h \
  include/com/diag/desperado/End.h \
  include/com/diag/desperado/Epoch.h \
+ include/com/diag/desperado/Exception.h \
  include/com/diag/desperado/FileInput.h \
  include/com/diag/desperado/FileOutput.h \
  include/com/diag/desperado/Heap.h \
@@ -98,6 +127,7 @@ MANIFEST_H=\
  include/com/diag/desperado/InputOutput.h \
  include/com/diag/desperado/LeapSeconds.h \
  include/com/diag/desperado/Linux.h \
+ include/com/diag/desperado/LocalTime.h \
  include/com/diag/desperado/LogOutput.h \
  include/com/diag/desperado/Logger.h \
  include/com/diag/desperado/Number.h \
@@ -108,12 +138,19 @@ MANIFEST_H=\
  include/com/diag/desperado/Platform.h \
  include/com/diag/desperado/Print.h \
  include/com/diag/desperado/SyslogOutput.h \
+ include/com/diag/desperado/Ticks.h \
  include/com/diag/desperado/Time.h \
+ include/com/diag/desperado/TimeStamp.h \
  include/com/diag/desperado/TimeZone.h \
  include/com/diag/desperado/Vintage.h \
  include/com/diag/desperado/cxxcapi.h \
+ include/com/diag/desperado/assert.h \
+ include/com/diag/desperado/debug.h \
  include/com/diag/desperado/errno.h \
+ include/com/diag/desperado/exceptions.h \
  include/com/diag/desperado/generics.h \
+ include/com/diag/desperado/littleendian.h \
+ include/com/diag/desperado/lowtohigh.h \
  include/com/diag/desperado/ready.h \
  include/com/diag/desperado/release.h \
  include/com/diag/desperado/stdarg.h \
@@ -142,6 +179,14 @@ MANIFEST_CPP=\
  DaylightSavingTime.cpp \
  DescriptorInput.cpp \
  DescriptorOutput.cpp \
+ DstAlways.cpp \
+ DstEu.cpp \
+ DstGeneric.cpp \
+ DstNever.cpp \
+ DstUs.cpp \
+ DstUs1966.cpp \
+ DstUs1986.cpp \
+ DstUs2007.cpp \
  Dump.cpp \
  DumpInput.cpp \
  DumpOutput.cpp \
@@ -153,6 +198,7 @@ MANIFEST_CPP=\
  InputOutput.cpp \
  LeapSeconds.cpp \
  Linux.cpp \
+ LocalTime.cpp \
  LogOutput.cpp \
  Logger.cpp \
  Number_int8.cpp \
@@ -168,9 +214,12 @@ MANIFEST_CPP=\
  PathInput.cpp \
  PathOutput.cpp \
  Platform.cpp \
+ PlatformApi.cpp \
  Print.cpp \
  SyslogOutput.cpp \
+ Ticks.cpp \
  Time.cpp \
+ TimeStamp.cpp \
  TimeZone.cpp \
  Vintage.cpp \
  ready.cpp \
@@ -190,6 +239,8 @@ MANIFEST_O=$(addsuffix .o,$(basename $(MANIFEST_CPP)))
 # BUILD
 ################################################################################
 
+TARGETS+=include/com/diag/$(CORELC)
+
 TARGETS+=$(MANIFEST_H)
 
 TARGETS+=$(MANIFEST_CPP)
@@ -202,12 +253,14 @@ ARCHIVABLE+=$(MANIFEST_O)
 # LIBRARIES AND SHARED OBJECTS
 ################################################################################
 
+TARGETS+=lib$(PROJECT).a
 DELIVERABLES+=lib$(PROJECT).a
 
 lib$(PROJECT).a:	$(ARCHIVABLE)
 	$(AR) $(ARFLAGS) lib$(PROJECT).a $(ARCHIVABLE)
 	$(RANLIB) lib$(PROJECT).a
 
+TARGETS+=lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD)
 DELIVERABLES+=lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD)
 
 lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD):	lib$(PROJECT).a
@@ -217,16 +270,19 @@ lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD):	lib$(PROJECT).a
 	$(CC) $(CARCH) -shared -Wl,-soname,lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD) -o lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD) $$THERE/*.o; \
 	rm -rf $$THERE
 
+TARGETS+=lib$(PROJECT).so.$(MAJOR).$(MINOR)
 DELIVERABLES+=lib$(PROJECT).so.$(MAJOR).$(MINOR)
 
 lib$(PROJECT).so.$(MAJOR).$(MINOR):	lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD)
 	ln -s -f lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD) lib$(PROJECT).so.$(MAJOR).$(MINOR)
 
+TARGETS+=lib$(PROJECT).so.$(MAJOR)
 DELIVERABLES+=lib$(PROJECT).so.$(MAJOR)
 
 lib$(PROJECT).so.$(MAJOR):	lib$(PROJECT).so.$(MAJOR).$(MINOR)
 	ln -s -f lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD) lib$(PROJECT).so.$(MAJOR)
 
+TARGETS+=lib$(PROJECT).so
 DELIVERABLES+=lib$(PROJECT).so
 
 lib$(PROJECT).so:	lib$(PROJECT).so.$(MAJOR)
@@ -252,6 +308,9 @@ lib$(PROJECT).so:	lib$(PROJECT).so.$(MAJOR)
 	$(STRIP) -o $@ $<
 	
 include/com/diag/$(CORELC)/%.h:	$(CORE_DIR)/include/com/diag/$(CORELC)/%.h
+	cp $< $@
+		
+%.h:	$(CORE_DIR)/%.h
 	cp $< $@
 	
 %.cpp:	$(CORE_DIR)/%.cpp
