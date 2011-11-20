@@ -170,70 +170,70 @@ MANIFEST_H=\
  README.h
 
 MANIFEST_CPP=\
- BufferInput.cpp \
- BufferOutput.cpp \
- CommonEra.cpp \
- DataInput.cpp \
- Date.cpp \
- DateTime.cpp \
- DaylightSavingTime.cpp \
- DescriptorInput.cpp \
- DescriptorOutput.cpp \
- DstAlways.cpp \
- DstEu.cpp \
- DstGeneric.cpp \
- DstNever.cpp \
- DstUs.cpp \
- DstUs1966.cpp \
- DstUs1986.cpp \
- DstUs2007.cpp \
- Dump.cpp \
- DumpInput.cpp \
- DumpOutput.cpp \
- Epoch.cpp \
- FileInput.cpp \
- FileOutput.cpp \
- Heap.cpp \
- Input.cpp \
- InputOutput.cpp \
- LeapSeconds.cpp \
- Linux.cpp \
- LocalTime.cpp \
- LogOutput.cpp \
- Logger.cpp \
- Number_int8.cpp \
- Number_int16.cpp \
- Number_int32.cpp \
- Number_int64.cpp \
- Number_uint8.cpp \
- Number_uint16.cpp \
- Number_uint32.cpp \
- Number_uint64.cpp \
- Object.cpp \
- Output.cpp \
- PathInput.cpp \
- PathOutput.cpp \
- Platform.cpp \
- PlatformApi.cpp \
- Print.cpp \
- SyslogOutput.cpp \
- Ticks.cpp \
- Time.cpp \
- TimeStamp.cpp \
- TimeZone.cpp \
- Vintage.cpp \
- ready.cpp \
- string.cpp \
- int8_Number.cpp \
- int16_Number.cpp \
- int32_Number.cpp \
- int64_Number.cpp \
- uint8_Number.cpp \
- uint16_Number.cpp \
- uint32_Number.cpp \
- uint64_Number.cpp
+ desperado/BufferInput.cpp \
+ desperado/BufferOutput.cpp \
+ desperado/CommonEra.cpp \
+ desperado/DataInput.cpp \
+ desperado/Date.cpp \
+ desperado/DateTime.cpp \
+ desperado/DaylightSavingTime.cpp \
+ desperado/DescriptorInput.cpp \
+ desperado/DescriptorOutput.cpp \
+ desperado/DstAlways.cpp \
+ desperado/DstEu.cpp \
+ desperado/DstGeneric.cpp \
+ desperado/DstNever.cpp \
+ desperado/DstUs.cpp \
+ desperado/DstUs1966.cpp \
+ desperado/DstUs1986.cpp \
+ desperado/DstUs2007.cpp \
+ desperado/Dump.cpp \
+ desperado/DumpInput.cpp \
+ desperado/DumpOutput.cpp \
+ desperado/Epoch.cpp \
+ desperado/FileInput.cpp \
+ desperado/FileOutput.cpp \
+ desperado/Heap.cpp \
+ desperado/Input.cpp \
+ desperado/InputOutput.cpp \
+ desperado/LeapSeconds.cpp \
+ desperado/Linux.cpp \
+ desperado/LocalTime.cpp \
+ desperado/LogOutput.cpp \
+ desperado/Logger.cpp \
+ desperado/Number_int8.cpp \
+ desperado/Number_int16.cpp \
+ desperado/Number_int32.cpp \
+ desperado/Number_int64.cpp \
+ desperado/Number_uint8.cpp \
+ desperado/Number_uint16.cpp \
+ desperado/Number_uint32.cpp \
+ desperado/Number_uint64.cpp \
+ desperado/Object.cpp \
+ desperado/Output.cpp \
+ desperado/PathInput.cpp \
+ desperado/PathOutput.cpp \
+ desperado/Platform.cpp \
+ desperado/PlatformApi.cpp \
+ desperado/Print.cpp \
+ desperado/SyslogOutput.cpp \
+ desperado/Ticks.cpp \
+ desperado/Time.cpp \
+ desperado/TimeStamp.cpp \
+ desperado/TimeZone.cpp \
+ desperado/Vintage.cpp \
+ desperado/ready.cpp \
+ desperado/string.cpp \
+ desperado/int8_Number.cpp \
+ desperado/int16_Number.cpp \
+ desperado/int32_Number.cpp \
+ desperado/int64_Number.cpp \
+ desperado/uint8_Number.cpp \
+ desperado/uint16_Number.cpp \
+ desperado/uint32_Number.cpp \
+ desperado/uint64_Number.cpp
 	
-MANIFEST_O=$(addsuffix .o,$(basename $(MANIFEST_CPP)))
+MANIFEST_O=$(addsuffix .o, $(basename $(MANIFEST_CPP)))
 
 ################################################################################
 # BUILD
@@ -313,10 +313,10 @@ include/com/diag/$(CORELC)/%.h:	$(CORE_DIR)/include/com/diag/$(CORELC)/%.h
 %.h:	$(CORE_DIR)/%.h
 	cp $< $@
 	
-%.cpp:	$(CORE_DIR)/%.cpp
+$(CORELC)/%.cpp:	$(CORE_DIR)/%.cpp
 	cp $< $@
 
-%.c:	$(CORE_DIR)/%.c
+$(CORELC)/%.c:	$(CORE_DIR)/%.c
 	cp $< $@
 
 ################################################################################
