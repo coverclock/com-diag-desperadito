@@ -98,6 +98,7 @@ MANIFEST_H=\
  include/com/diag/desperado/BufferInput.h \
  include/com/diag/desperado/BufferOutput.h \
  include/com/diag/desperado/CommonEra.h \
+ include/com/diag/desperado/CriticalSection.h \
  include/com/diag/desperado/Constant.h \
  include/com/diag/desperado/DataInput.h \
  include/com/diag/desperado/Date.h \
@@ -130,6 +131,7 @@ MANIFEST_H=\
  include/com/diag/desperado/LocalTime.h \
  include/com/diag/desperado/LogOutput.h \
  include/com/diag/desperado/Logger.h \
+ include/com/diag/desperado/Mutex.h \
  include/com/diag/desperado/Number.h \
  include/com/diag/desperado/Object.h \
  include/com/diag/desperado/Output.h \
@@ -201,6 +203,7 @@ MANIFEST_CPP=\
  desperado/LocalTime.cpp \
  desperado/LogOutput.cpp \
  desperado/Logger.cpp \
+ desperado/Mutex.cpp \
  desperado/Number_int8.cpp \
  desperado/Number_int16.cpp \
  desperado/Number_int32.cpp \
