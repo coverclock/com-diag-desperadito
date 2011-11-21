@@ -1,0 +1,3 @@
+MAJOR		=	6
+MINOR		=	4
+BUILD		=	0
