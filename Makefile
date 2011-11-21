@@ -13,7 +13,6 @@ PROJECT=desperadito
 
 CORE=Desperado
 CORELC=desperado
-CORE_DIR=$(shell cd ../$(CORE); pwd)
 
 SVN_URL=svn://graphite/$(PROJECT)/trunk/Desperadito
 HTTP_URL=http://www.diag.com/navigation/downloads/Desperadito.html
@@ -237,13 +236,18 @@ MANIFEST_O=$(addprefix $(CORELC)/, $(addsuffix .o, $(basename $(MANIFEST_CPP))))
 
 PHONY+=refresh
 
-refresh:	release.mk
-	( for H in $(MANIFEST_H); do cp $(CORE_DIR)/include/com/diag/$(CORELC)/$$H include/com/diag/$(CORELC)/$$H; done )
-	( for C in $(MANIFEST_CPP); do cp $(CORE_DIR)/$$C $(CORELC)/$$C; done )
-	( for E in $(MANIFEST_ETC); do cp $(CORE_DIR)/$$E $$E; done )
-	
-release.mk:	$(CORE_DIR)/Makefile
-	egrep '^(MAJOR|MINOR|BUILD)[[:space:]]*=' $(CORE_DIR)/Makefile > release.mk
+# I use this to refresh the Desperadito sources against the core Desperado code
+# base. You will never need to do this unless you have downloaded your own
+# version of Desperado and have made changes to it.
+
+refresh:
+	( \
+		D=$(shell cd ../$(CORE); pwd); \
+		egrep '^(MAJOR|MINOR|BUILD)[[:space:]]*=' $$D/Makefile > release.mk; \
+		( for H in $(MANIFEST_H); do cp $$D/include/com/diag/$(CORELC)/$$H include/com/diag/$(CORELC)/$$H; done ); \
+		( for C in $(MANIFEST_CPP); do cp $$D/$$C $(CORELC)/$$C; done ); \
+		( for E in $(MANIFEST_ETC); do cp $$D/$$E $$E; done ); \
+	)
 	
 -include release.mk
 
