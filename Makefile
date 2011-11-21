@@ -9,10 +9,14 @@
 # The core project contains the unit tests.
 ################################################################################
 
+CORE=Desperado
+CORELC=desperado
+CORE_DIR=$(shell cd ../$(CORE); pwd)
+
 PROJECT=desperadito
-MAJOR=6
-MINOR=4
-BUILD=0
+MAJOR=$(shell awk -F= '$$1~/^MAJOR[ \t]*/ { gsub(/[ \t]*/,"", $$2); print $$2; }' $(CORE_DIR)/Makefile)
+MINOR=$(shell awk -F= '$$1~/^MINOR[ \t]*/ { gsub(/[ \t]*/,"", $$2); print $$2; }' $(CORE_DIR)/Makefile)
+BUILD=$(shell awk -F= '$$1~/^BUILD[ \t]*/ { gsub(/[ \t]*/,"", $$2); print $$2; }' $(CORE_DIR)/Makefile)
 
 SVN_URL=svn://graphite/$(PROJECT)/trunk/Desperadito
 HTTP_URL=http://www.diag.com/navigation/downloads/Desperadito.html
@@ -21,10 +25,6 @@ TMP=/tmp
 
 PLATFORM=Linux
 TARGET=IA32
-
-CORE=Desperado
-CORELC=desperado
-CORE_DIR=$(shell cd ../$(CORE); pwd)
 
 ################################################################################
 # LISTS
@@ -343,20 +343,6 @@ depend:
 -include dependencies.mk
 
 ################################################################################
-# ENTRY POINTS
-################################################################################
-
-PHONY+=all clean clobber pristine
-
-all:	$(TARGETS)
-
-clean:
-	rm -f $(ARTIFACTS)
-	
-clobber:	clean
-	rm -f $(DELIVERABLES)
-
-################################################################################
 # DISTRIBUTION
 ################################################################################
 
@@ -369,6 +355,20 @@ dist $(PROJECT)-$(MAJOR).$(MINOR).$(BUILD).tgz:
 	svn export $(SVN_URL) $$TARDIR/$(PROJECT)-$(MAJOR).$(MINOR).$(BUILD); \
 	tar -C $$TARDIR -cvzf - $(PROJECT)-$(MAJOR).$(MINOR).$(BUILD) > $(PROJECT)-$(MAJOR).$(MINOR).$(BUILD).tgz; \
 	rm -rf $$TARDIR
+
+################################################################################
+# ENTRY POINTS
+################################################################################
+
+PHONY+=all clean clobber pristine
+
+all:	$(TARGETS)
+
+clean:
+	rm -f $(ARTIFACTS)
+	
+clobber:	clean
+	rm -f $(DELIVERABLES)
 
 ################################################################################
 # END
