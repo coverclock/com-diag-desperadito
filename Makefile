@@ -83,12 +83,6 @@ PHONY+=default
 
 default:	all
 
-include/com/diag/$(CORELC):
-	mkdir -p $@
-	
-desperado:
-	mkdir -p $@
-
 ################################################################################
 # MANIFESTS
 ################################################################################
@@ -243,6 +237,7 @@ MANIFEST_O=$(addsuffix .o, $(basename $(MANIFEST_CPP)))
 ################################################################################
 
 TARGETS+=include/com/diag/$(CORELC)
+TARGETS+=$(CORELC)
 
 TARGETS+=$(MANIFEST_H)
 
@@ -251,6 +246,16 @@ TARGETS+=$(MANIFEST_CPP)
 TARGETS+=$(MANIFEST_O)
 ARTIFACTS+=$(MANIFEST_O)
 ARCHIVABLE+=$(MANIFEST_O)
+
+################################################################################
+# DIRECTORIES
+################################################################################
+
+include/com/diag/$(CORELC):
+	mkdir -p $@
+	
+$(CORELC):
+	mkdir -p $@
 
 ################################################################################
 # LIBRARIES AND SHARED OBJECTS
@@ -312,7 +317,7 @@ lib$(PROJECT).so:	lib$(PROJECT).so.$(MAJOR)
 	
 include/com/diag/$(CORELC)/%.h:	$(CORE_DIR)/include/com/diag/$(CORELC)/%.h
 	cp $< $@
-		
+
 %.h:	$(CORE_DIR)/%.h
 	cp $< $@
 	
@@ -323,7 +328,7 @@ $(CORELC)/%.c:	$(CORE_DIR)/%.c
 	cp $< $@
 
 ################################################################################
-# DEPENCENDIES
+# DEPENDENCIES
 ################################################################################
 
 PHONY+=depend
