@@ -9,14 +9,11 @@
 # The core project contains the unit tests.
 ################################################################################
 
+PROJECT=desperadito
+
 CORE=Desperado
 CORELC=desperado
 CORE_DIR=$(shell cd ../$(CORE); pwd)
-
-PROJECT=desperadito
-MAJOR=$(shell awk -F= '$$1~/^MAJOR[ \t]*/ { gsub(/[ \t]*/,"", $$2); print $$2; }' $(CORE_DIR)/Makefile)
-MINOR=$(shell awk -F= '$$1~/^MINOR[ \t]*/ { gsub(/[ \t]*/,"", $$2); print $$2; }' $(CORE_DIR)/Makefile)
-BUILD=$(shell awk -F= '$$1~/^BUILD[ \t]*/ { gsub(/[ \t]*/,"", $$2); print $$2; }' $(CORE_DIR)/Makefile)
 
 SVN_URL=svn://graphite/$(PROJECT)/trunk/Desperadito
 HTTP_URL=http://www.diag.com/navigation/downloads/Desperadito.html
@@ -88,149 +85,167 @@ default:	all
 ################################################################################
 
 MANIFEST_H=\
- include/com/diag/desperado/Begin.h \
- include/com/diag/desperado/BufferInput.h \
- include/com/diag/desperado/BufferOutput.h \
- include/com/diag/desperado/CommonEra.h \
- include/com/diag/desperado/CriticalSection.h \
- include/com/diag/desperado/Constant.h \
- include/com/diag/desperado/DataInput.h \
- include/com/diag/desperado/Date.h \
- include/com/diag/desperado/DateTime.h \
- include/com/diag/desperado/DaylightSavingTime.h \
- include/com/diag/desperado/DescriptorInput.h \
- include/com/diag/desperado/DescriptorOutput.h \
- include/com/diag/desperado/Desperado.h \
- include/com/diag/desperado/DstAlways.h \
- include/com/diag/desperado/DstEu.h \
- include/com/diag/desperado/DstGeneric.h \
- include/com/diag/desperado/DstNever.h \
- include/com/diag/desperado/DstUs.h \
- include/com/diag/desperado/DstUs1966.h \
- include/com/diag/desperado/DstUs1986.h \
- include/com/diag/desperado/DstUs2007.h \
- include/com/diag/desperado/Dump.h \
- include/com/diag/desperado/DumpInput.h \
- include/com/diag/desperado/DumpOutput.h \
- include/com/diag/desperado/End.h \
- include/com/diag/desperado/Epoch.h \
- include/com/diag/desperado/Exception.h \
- include/com/diag/desperado/FileInput.h \
- include/com/diag/desperado/FileOutput.h \
- include/com/diag/desperado/Heap.h \
- include/com/diag/desperado/Input.h \
- include/com/diag/desperado/InputOutput.h \
- include/com/diag/desperado/LeapSeconds.h \
- include/com/diag/desperado/Linux.h \
- include/com/diag/desperado/LocalTime.h \
- include/com/diag/desperado/LogOutput.h \
- include/com/diag/desperado/Logger.h \
- include/com/diag/desperado/Mutex.h \
- include/com/diag/desperado/Number.h \
- include/com/diag/desperado/Object.h \
- include/com/diag/desperado/Output.h \
- include/com/diag/desperado/PathInput.h \
- include/com/diag/desperado/PathOutput.h \
- include/com/diag/desperado/Platform.h \
- include/com/diag/desperado/Print.h \
- include/com/diag/desperado/SyslogOutput.h \
- include/com/diag/desperado/Ticks.h \
- include/com/diag/desperado/Time.h \
- include/com/diag/desperado/TimeStamp.h \
- include/com/diag/desperado/TimeZone.h \
- include/com/diag/desperado/Vintage.h \
- include/com/diag/desperado/cxxcapi.h \
- include/com/diag/desperado/assert.h \
- include/com/diag/desperado/debug.h \
- include/com/diag/desperado/errno.h \
- include/com/diag/desperado/exceptions.h \
- include/com/diag/desperado/generics.h \
- include/com/diag/desperado/littleendian.h \
- include/com/diag/desperado/lowtohigh.h \
- include/com/diag/desperado/ready.h \
- include/com/diag/desperado/release.h \
- include/com/diag/desperado/stdarg.h \
- include/com/diag/desperado/stdio.h \
- include/com/diag/desperado/stdlib.h \
- include/com/diag/desperado/string.h \
- include/com/diag/desperado/target.h \
- include/com/diag/desperado/types.h \
- include/com/diag/desperado/int8_Number.h \
- include/com/diag/desperado/int16_Number.h \
- include/com/diag/desperado/int32_Number.h \
- include/com/diag/desperado/int64_Number.h \
- include/com/diag/desperado/uint8_Number.h \
- include/com/diag/desperado/uint16_Number.h \
- include/com/diag/desperado/uint32_Number.h \
- include/com/diag/desperado/uint64_Number.h \
- README.h
+ Begin.h \
+ BufferInput.h \
+ BufferOutput.h \
+ CommonEra.h \
+ CriticalSection.h \
+ Constant.h \
+ DataInput.h \
+ Date.h \
+ DateTime.h \
+ DaylightSavingTime.h \
+ DescriptorInput.h \
+ DescriptorOutput.h \
+ Desperado.h \
+ DstAlways.h \
+ DstEu.h \
+ DstGeneric.h \
+ DstNever.h \
+ DstUs.h \
+ DstUs1966.h \
+ DstUs1986.h \
+ DstUs2007.h \
+ Dump.h \
+ DumpInput.h \
+ DumpOutput.h \
+ End.h \
+ Epoch.h \
+ Exception.h \
+ FileInput.h \
+ FileOutput.h \
+ Heap.h \
+ Input.h \
+ InputOutput.h \
+ LeapSeconds.h \
+ Linux.h \
+ LocalTime.h \
+ LogOutput.h \
+ Logger.h \
+ Mutex.h \
+ Number.h \
+ Object.h \
+ Output.h \
+ PathInput.h \
+ PathOutput.h \
+ Platform.h \
+ Print.h \
+ SyslogOutput.h \
+ Ticks.h \
+ Time.h \
+ TimeStamp.h \
+ TimeZone.h \
+ Vintage.h \
+ cxxcapi.h \
+ assert.h \
+ debug.h \
+ errno.h \
+ exceptions.h \
+ generics.h \
+ littleendian.h \
+ lowtohigh.h \
+ ready.h \
+ release.h \
+ stdarg.h \
+ stdio.h \
+ stdlib.h \
+ string.h \
+ target.h \
+ types.h \
+ int8_Number.h \
+ int16_Number.h \
+ int32_Number.h \
+ int64_Number.h \
+ uint8_Number.h \
+ uint16_Number.h \
+ uint32_Number.h \
+ uint64_Number.h
 
 MANIFEST_CPP=\
- desperado/BufferInput.cpp \
- desperado/BufferOutput.cpp \
- desperado/CommonEra.cpp \
- desperado/DataInput.cpp \
- desperado/Date.cpp \
- desperado/DateTime.cpp \
- desperado/DaylightSavingTime.cpp \
- desperado/DescriptorInput.cpp \
- desperado/DescriptorOutput.cpp \
- desperado/DstAlways.cpp \
- desperado/DstEu.cpp \
- desperado/DstGeneric.cpp \
- desperado/DstNever.cpp \
- desperado/DstUs.cpp \
- desperado/DstUs1966.cpp \
- desperado/DstUs1986.cpp \
- desperado/DstUs2007.cpp \
- desperado/Dump.cpp \
- desperado/DumpInput.cpp \
- desperado/DumpOutput.cpp \
- desperado/Epoch.cpp \
- desperado/FileInput.cpp \
- desperado/FileOutput.cpp \
- desperado/Heap.cpp \
- desperado/Input.cpp \
- desperado/InputOutput.cpp \
- desperado/LeapSeconds.cpp \
- desperado/Linux.cpp \
- desperado/LocalTime.cpp \
- desperado/LogOutput.cpp \
- desperado/Logger.cpp \
- desperado/Mutex.cpp \
- desperado/Number_int8.cpp \
- desperado/Number_int16.cpp \
- desperado/Number_int32.cpp \
- desperado/Number_int64.cpp \
- desperado/Number_uint8.cpp \
- desperado/Number_uint16.cpp \
- desperado/Number_uint32.cpp \
- desperado/Number_uint64.cpp \
- desperado/Object.cpp \
- desperado/Output.cpp \
- desperado/PathInput.cpp \
- desperado/PathOutput.cpp \
- desperado/Platform.cpp \
- desperado/PlatformApi.cpp \
- desperado/Print.cpp \
- desperado/SyslogOutput.cpp \
- desperado/Ticks.cpp \
- desperado/Time.cpp \
- desperado/TimeStamp.cpp \
- desperado/TimeZone.cpp \
- desperado/Vintage.cpp \
- desperado/ready.cpp \
- desperado/string.cpp \
- desperado/int8_Number.cpp \
- desperado/int16_Number.cpp \
- desperado/int32_Number.cpp \
- desperado/int64_Number.cpp \
- desperado/uint8_Number.cpp \
- desperado/uint16_Number.cpp \
- desperado/uint32_Number.cpp \
- desperado/uint64_Number.cpp
+ BufferInput.cpp \
+ BufferOutput.cpp \
+ CommonEra.cpp \
+ DataInput.cpp \
+ Date.cpp \
+ DateTime.cpp \
+ DaylightSavingTime.cpp \
+ DescriptorInput.cpp \
+ DescriptorOutput.cpp \
+ DstAlways.cpp \
+ DstEu.cpp \
+ DstGeneric.cpp \
+ DstNever.cpp \
+ DstUs.cpp \
+ DstUs1966.cpp \
+ DstUs1986.cpp \
+ DstUs2007.cpp \
+ Dump.cpp \
+ DumpInput.cpp \
+ DumpOutput.cpp \
+ Epoch.cpp \
+ FileInput.cpp \
+ FileOutput.cpp \
+ Heap.cpp \
+ Input.cpp \
+ InputOutput.cpp \
+ LeapSeconds.cpp \
+ Linux.cpp \
+ LocalTime.cpp \
+ LogOutput.cpp \
+ Logger.cpp \
+ Mutex.cpp \
+ Number_int8.cpp \
+ Number_int16.cpp \
+ Number_int32.cpp \
+ Number_int64.cpp \
+ Number_uint8.cpp \
+ Number_uint16.cpp \
+ Number_uint32.cpp \
+ Number_uint64.cpp \
+ Object.cpp \
+ Output.cpp \
+ PathInput.cpp \
+ PathOutput.cpp \
+ Platform.cpp \
+ PlatformApi.cpp \
+ Print.cpp \
+ SyslogOutput.cpp \
+ Ticks.cpp \
+ Time.cpp \
+ TimeStamp.cpp \
+ TimeZone.cpp \
+ Vintage.cpp \
+ ready.cpp \
+ string.cpp \
+ int8_Number.cpp \
+ int16_Number.cpp \
+ int32_Number.cpp \
+ int64_Number.cpp \
+ uint8_Number.cpp \
+ uint16_Number.cpp \
+ uint32_Number.cpp \
+ uint64_Number.cpp
+ 
+MANIFEST_ETC=\
+ README.h
 	
-MANIFEST_O=$(addsuffix .o, $(basename $(MANIFEST_CPP)))
+MANIFEST_O=$(addprefix $(CORELC)/, $(addsuffix .o, $(basename $(MANIFEST_CPP))))
+
+################################################################################
+# REFRESH
+################################################################################
+
+PHONY+=refresh
+
+refresh:	release.mk
+	( for H in $(MANIFEST_H); do cp $(CORE_DIR)/include/com/diag/$(CORELC)/$$H include/com/diag/$(CORELC)/$$H; done )
+	( for C in $(MANIFEST_CPP); do cp $(CORE_DIR)/$$C $(CORELC)/$$C; done )
+	( for E in $(MANIFEST_ETC); do cp $(CORE_DIR)/$$E $$E; done )
+	
+release.mk:	$(CORE_DIR)/Makefile
+	egrep '^(MAJOR|MINOR|BUILD)[[:space:]]*=' $(CORE_DIR)/Makefile > release.mk
+	
+-include release.mk
 
 ################################################################################
 # BUILD
@@ -238,10 +253,6 @@ MANIFEST_O=$(addsuffix .o, $(basename $(MANIFEST_CPP)))
 
 TARGETS+=include/com/diag/$(CORELC)
 TARGETS+=$(CORELC)
-
-TARGETS+=$(MANIFEST_H)
-
-TARGETS+=$(MANIFEST_CPP)
 
 TARGETS+=$(MANIFEST_O)
 ARTIFACTS+=$(MANIFEST_O)
@@ -314,18 +325,6 @@ lib$(PROJECT).so:	lib$(PROJECT).so.$(MAJOR)
 
 %:	%_unstripped
 	$(STRIP) -o $@ $<
-	
-include/com/diag/$(CORELC)/%.h:	$(CORE_DIR)/include/com/diag/$(CORELC)/%.h
-	cp $< $@
-
-%.h:	$(CORE_DIR)/%.h
-	cp $< $@
-	
-$(CORELC)/%.cpp:	$(CORE_DIR)/%.cpp
-	cp $< $@
-
-$(CORELC)/%.c:	$(CORE_DIR)/%.c
-	cp $< $@
 
 ################################################################################
 # DEPENDENCIES
