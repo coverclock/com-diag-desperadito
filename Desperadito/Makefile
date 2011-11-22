@@ -121,6 +121,7 @@ MANIFEST_H=\
  LocalTime.h \
  LogOutput.h \
  Logger.h \
+ MemoryBarrier.h \
  Mutex.h \
  Number.h \
  Object.h \
@@ -135,6 +136,7 @@ MANIFEST_H=\
  TimeStamp.h \
  TimeZone.h \
  Vintage.h \
+ barrier.h \
  cxxcapi.h \
  assert.h \
  debug.h \
@@ -214,6 +216,7 @@ MANIFEST_CPP=\
  TimeStamp.cpp \
  TimeZone.cpp \
  Vintage.cpp \
+ barrier.cpp \
  ready.cpp \
  string.cpp \
  int8_Number.cpp \
