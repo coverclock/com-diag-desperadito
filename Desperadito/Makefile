@@ -22,9 +22,6 @@ HTTP_URL=http://www.diag.com/navigation/downloads/Desperadito.html
 
 TMP=/tmp
 
-PLATFORM=Linux
-TARGET=IA32
-
 ################################################################################
 # LISTS
 ################################################################################
@@ -48,6 +45,9 @@ PROJECT_LIBS=.
 PROJECT_LIB=lib$(PROJECT).so
 PROJECT_INC=include
 
+PLATFORM=Linux
+TARGET=IA32# Doesn't really matter for this particular application.
+
 PROJECT_CDEFINES=\
  -DDESPERADO_TARGET_IS_$(TARGET) \
  -DDESPERADO_TARGET_NAME="\"$(TARGET)\"" \
@@ -61,11 +61,11 @@ PROJECT_CDEFINES=\
 PROJECT_CPPFLAGS=-I$(PROJECT_INC) $(PROJECT_CDEFINES)
 PROJECT_LDFLAGS=-L$(PROJECT_LIBS) -l$(PROJECT)
 
-CC=gcc
-CXX=g++
-AR=ar
-RANLIB=ranlib
-STRIP=strip
+CC=$(CROSS_COMPILE)gcc
+CXX=$(CROSS_COMPILE)g++
+AR=$(CROSS_COMPILE)ar
+RANLIB=$(CROSS_COMPILE)ranlib
+STRIP=$(CROSS_COMPILE)strip
 
 CPPFLAGS=$(PROJECT_CPPFLAGS)
 CFLAGS=-g
