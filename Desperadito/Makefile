@@ -13,6 +13,7 @@ PROJECT=desperadito
 
 # MAJOR inherited from Desperado.
 # MINOR inherited from Desperado.
+# BUILD inherited from Desperado.
 
 CORE=Desperado
 CORELC=desperado
@@ -372,6 +373,33 @@ dist $(PROJECT)-$(MAJOR).$(MINOR).$(BUILD).tgz:
 	svn export $(SVN_URL) $$TARDIR/$(PROJECT)-$(MAJOR).$(MINOR).$(BUILD); \
 	tar -C $$TARDIR -cvzf - $(PROJECT)-$(MAJOR).$(MINOR).$(BUILD) > $(PROJECT)-$(MAJOR).$(MINOR).$(BUILD).tgz; \
 	rm -rf $$TARDIR
+
+################################################################################
+# DOCUMENTATION
+################################################################################
+
+DOC_DIR=doc
+BROWSER=firefox
+
+PHONY+=documentation browse refman manpages
+DELIVERABLES+=$(DOC_DIR)
+
+documentation:
+	mkdir -p $(DOC_DIR)/latex $(DOC_DIR)/man $(DOC_DIR)/pdf
+	sed -e "s/\\\$$Name.*\\\$$/$(MAJOR).$(MINOR).$(BUILD)/" < doxygen.cf > doxygen-local.cf
+	doxygen doxygen-local.cf
+	( cd $(DOC_DIR)/latex; $(MAKE) refman.pdf; cp refman.pdf ../pdf )
+	cat $(DOC_DIR)/man/man3/*.3 | groff -man -Tps - > $(DOC_DIR)/pdf/manpages.ps
+	ps2pdf $(DOC_DIR)/pdf/manpages.ps $(DOC_DIR)/pdf/manpages.pdf
+
+browse:
+	$(BROWSER) file:doc/html/index.html
+
+refman:
+	$(BROWSER) file:doc/pdf/refman.pdf
+
+manpages:
+	$(BROWSER) file:doc/pdf/manpages.pdf
 
 ################################################################################
 # ENTRY POINTS
