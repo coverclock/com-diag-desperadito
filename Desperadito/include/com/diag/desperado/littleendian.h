@@ -81,7 +81,7 @@
  */
 CXXCINLINE int littleendian(void) {
     unsigned long word=1;
-    return ((*(reinterpretcastto(char*, &word))) != 0) ? 1 : 0;
+    return ((*(staticcastto(char*, &word))) != 0) ? 1 : 0;
 }
 
 #else
