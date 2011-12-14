@@ -1,3 +1,3 @@
 MAJOR		=	6
-MINOR		=	7
+MINOR		=	8
 BUILD		=	0
