@@ -94,7 +94,9 @@ public:
      *
      *  @oaram block	if true causes the calling thread to be uncancellable
      *  				from the time the mutex is initially locked until it is
-     *  				finally unlocked, which is the default behavior.
+     *  				finally unlocked, which is the default behavior. Setting
+     *  				this parameter to false is really dangerous since
+     *  				canceled threads can leave the mutex permanently locked.
      *
      *  @return true if successful, false otherwise.
      */
@@ -160,6 +162,20 @@ public:
     virtual void show(int level = 0, Output* display = 0, int indent = 0) const;
 
 private:
+
+    /**
+     *  Copy constructor. POISONED.
+     *
+     *  @param that refers to an R-value object of this type.
+     */
+    Mutex(const Mutex& that);
+
+    /**
+     *  Assignment operator. POISONED.
+     *
+     *  @param that refers to an R-value object of this type.
+     */
+    Mutex& operator=(const Mutex& that);
 
     /**
      * This is a POSIX spin lock which only has an effect on multi-processor

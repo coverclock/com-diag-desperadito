@@ -171,6 +171,7 @@ MANIFEST_CPP=\
  BufferInput.cpp \
  BufferOutput.cpp \
  CommonEra.cpp \
+ CriticalSection.cpp \
  DataInput.cpp \
  Date.cpp \
  DateTime.cpp \
