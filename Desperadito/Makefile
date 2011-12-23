@@ -412,10 +412,10 @@ PHONY+=all clean clobber pristine
 all:	$(TARGETS)
 
 clean:
-	rm -f $(ARTIFACTS)
+	rm -rf $(ARTIFACTS)
 	
 clobber:	clean
-	rm -f $(DELIVERABLES)
+	rm -rf $(DELIVERABLES)
 
 ################################################################################
 # END
