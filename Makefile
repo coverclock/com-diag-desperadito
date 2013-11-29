@@ -500,7 +500,7 @@ depend:
 			$(CXX) $(CPPFLAGS) -MM -MG $$F >> dependencies.mk; \
 		done; \
 	done
-	for S in $(TST_DIR); do \
+	for S in $(SRC_DIR); do \
 		for F in $$S/*.c; do \
 			D=`dirname $$F`; \
 			echo -n "$(OUT)/$$D/" >> dependencies.mk; \
