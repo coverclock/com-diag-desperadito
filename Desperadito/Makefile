@@ -185,7 +185,7 @@ CFLAGS				=	$(CARCH) -fPIC -g
 #CFLAGS				=	$(CARCH) -fPIC -O3
 CPFLAGS				=	-i
 MVFLAGS				=	-i
-LDFLAGS				=	$(LDARCH) -L$(OUT)/lib -l$(PROJECT) -lpthread -lrt -ldl
+LDFLAGS				=	$(LDARCH) -L$(OUT)/lib -l$(PROJECT)xx -l$(PROJECT) -lpthread -lrt -ldl
 LDXXFLAGS			=	$(LDARCH) -L$(OUT)/lib -l$(PROJECT)xx -l$(PROJECT) -lpthread -lrt -ldl
 
 BROWSER				=	firefox
@@ -493,11 +493,18 @@ $(OUT)/$(BIN_DIR)/%:	$(OUT)/$(SYM_DIR)/%
 
 depend:
 	cp /dev/null dependencies.mk
-	for S in $(SRC_DIR); do \
+	for S in $(SRC_DIR) $(TST_DIR); do \
 		for F in $$S/*.cpp; do \
 			D=`dirname $$F`; \
 			echo -n "$(OUT)/$$D/" >> dependencies.mk; \
 			$(CXX) $(CPPFLAGS) -MM -MG $$F >> dependencies.mk; \
+		done; \
+	done
+	for S in $(TST_DIR); do \
+		for F in $$S/*.c; do \
+			D=`dirname $$F`; \
+			echo -n "$(OUT)/$$D/" >> dependencies.mk; \
+			$(CC) $(CPPFLAGS) -MM -MG $$F >> dependencies.mk; \
 		done; \
 	done
 
