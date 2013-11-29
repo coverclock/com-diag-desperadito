@@ -1,392 +1,433 @@
-################################################################################
-# Copyright 2011 by the Digital Aggregates Corporation, Colorado, USA
+# Copyright 2008-2013 Digital Aggregates Corporation, Colorado, USA
 # Licensed under the terms in README.h
-# Chip Overclock <coverclock@diag.com>
-# http://www.diag.com/navigation/downloads/Desperadito
-# This project is a subset of the much larger core project.
-# http://www.diag.com/navigation/downloads/Desperado
-# The source files are derived directly and unaltered from the core project.
-# The core project contains the unit tests.
-################################################################################
+# Chip Overclock
+# mailto:coverclock@diag.com
+# http://www.diag.com/navigation/downloads/Diminuto.html
 
-PROJECT=desperadito
+PROJECT				=	desperadito
+TITLE				=	Desperadito
+SYMBOL				=	DESPERADITO
 
-# MAJOR inherited from Desperado.
-# MINOR inherited from Desperado.
-# BUILD inherited from Desperado.
+########## Customizations
 
-CORE=Desperado
-CORELC=desperado
+TARGET				=	host
+#TARGET				=	cobbler
 
-SVN_URL=svn://graphite/$(PROJECT)/trunk/Desperadito
-HTTP_URL=http://www.diag.com/navigation/downloads/Desperadito.html
+MAJOR				=	7# API changes requiring that applications be modified.
+MINOR				=	1# Only functionality or features added with no legacy API changes.
+BUILD				=	0# Only bugs fixed with no API changes or new functionality.
 
-TMP=/tmp
+# Some certification, defense, or intelligence agencies (e.g. the U.S. Federal
+# Aviation Administration or FAA) require that software builds for safety
+# critical or national security applications generate exactly the same binary
+# images bit for bit if the source code has not changed. (This is theoretically
+# a more stringent requirement than requiring that checksums or cryptographic
+# hashes are the same, although in practice it is the same thing.) This allows
+# agency inspectors to verify the integrity of the binary software images. This
+# makes embedding timestamps inside compiled translation units problematic.
+# If your application has this requirement, you can pass in any fixed string
+# for the value of the VINTAGE make variable and you should be able to generate
+# identical images with subsequent builds of Diminuto. This string is embedded
+# inside the Diminuto vintage application.
+VINTAGE				:=	$(shell date -u +%Y-%m-%dT%H:%M:%S.%N%z)
 
-################################################################################
-# LISTS
-################################################################################
+# This stuff all gets embedded in the vintage application.
+COPYRIGHT			=	2013 Digital Aggregates Corporation, Colorado, USA.
+LICENSE				=	GNU Lesser General Public License 2.1
+CONTACT				=	coverclock@diag.com
+HOMEPAGE			=	http://www.diag.com/navigation/downloads/$(TITLE).html
 
-PHONY=# Make these targets every time regardless of dependencies.
+# You can change the VINFO make variable into whatever tool you use to extract
+# version information from your source code control system. For example, I
+# use Subversion here, and hence VINFO is the "svn info" command. But elsewhere,
+# I use Git, so maybe I'd use "git describe" in those circumstances. Or maybe
+# I'd have my own shell script. Or I'd just set this to echo some constant
+# string. If you don't have a source code control system, don't sweat it. If
+# the VINFO command fails or does not exist, all that happens is no such version
+# information is included in the Diminuto vintage application.
+VINFO				=	svn info
+#VINFO				=	git describe
 
-TARGETS=# Make these targets for make all.
+# This is where I store collateral associated with projects that I have
+# downloaded off the web and use without alteration. Examples: Linux kernel
+# sources, toolchains, etc.
+HOME_DIR			=	$(HOME)/projects
 
-ARTIFACTS=# Remove these targets for make clean.
+########## Configurations
 
-DELIVERABLES=# Remove these targets for make clobber.
+ifeq ($(TARGET),cobbler)# Build for the Raspberry Pi version B with the Raspbian system.
+ARCH				=	arm
+PLATFORM			=	linux
+CPPARCH				=
+CARCH				=	
+#LDARCH				=	-static
+LDARCH				=	-Bdynamic
+TOOLCHAIN			=	$(ARCH)-$(PLATFORM)-gnueabihf
+CROSS_COMPILE		=	$(TOOLCHAIN)-
+KERNEL_REV			=	rpi-3.6.y
+KERNEL_DIR			=	$(HOME_DIR)/cobbler/linux-$(KERNEL_REV)
+INCLUDE_DIR			=	$(HOME_DIR)/cobbler/include-$(KERNEL_REV)/include
+endif
 
-ARCHIVABLE=# Include these targets in the archive or shared library.
+ifeq ($(TARGET),host)# Build for an Intel build server with the Ubuntu kernel.
+ARCH				=	i386
+PLATFORM			=	linux
+CPPARCH				=
+CARCH				=
+LDARCH				=
+TOOLCHAIN			=
+CROSS_COMPILE		=
+KERNEL_REV			=	3.2.0-51
+KERNEL_DIR			=	/usr/src/linux-headers-$(KERNEL_REV)-generic-pae
+INCLUDE_DIR			=	/usr/include
+endif
 
-################################################################################
-# PROJECT
-################################################################################
+########## Directory Tree
 
-PROJECT_DIR=.
-PROJECT_LIBS=.
-PROJECT_LIB=lib$(PROJECT).so
-PROJECT_INC=include
+ARC_DIR				=	arc# Archive files
+BIN_DIR				=	bin# Stripped executable binaries
+DOC_DIR				=	doc# Documentation
+DRV_DIR				=	drv# Loadable kernel modules
+ETC_DIR				=	etc# Miscellaneous files
+GEN_DIR				=	gen# Generated files
+INC_DIR				=	inc# Header files
+LIB_DIR				=	lib# Shared objects
+MOD_DIR				=	mod# Loadable user modules
+OUT_DIR				=	out# Build artifacts
+SRC_DIR				=	src# Library source files
+SYM_DIR				=	sym# Unstripped executable binaries
+SYS_DIR				=	sys# Kernel module build directory
+TMP_DIR				=	tmp# Temporary files
+TST_DIR				=	tst# Unit tests
 
-PLATFORM=Linux
-TARGET=IA32# Doesn't really matter for this particular application.
+########## Variables
 
-PROJECT_CDEFINES=\
- -DDESPERADO_TARGET_IS_$(TARGET) \
- -DDESPERADO_TARGET_NAME="\"$(TARGET)\"" \
- -DDESPERADO_PLATFORM_IS_$(PLATFORM) \
- -DDESPERADO_PLATFORM_NAME="\"$(PLATFORM)\""  \
- -DDESPERADO_PLATFORM_CLASS=$(PLATFORM) \
- -DDESPERADO_HAS_SYSLOG \
- -D_REENTRANT \
- -D_GNU_SOURCE
+HERE				:=	$(shell pwd)
 
-PROJECT_CPPFLAGS=-I$(PROJECT_INC) $(PROJECT_CDEFINES)
-PROJECT_LDFLAGS=-L$(PROJECT_LIBS) -l$(PROJECT)
+OUT					=	$(OUT_DIR)/$(TARGET)
 
-CC=$(CROSS_COMPILE)gcc
-CXX=$(CROSS_COMPILE)g++
-AR=$(CROSS_COMPILE)ar
-RANLIB=$(CROSS_COMPILE)ranlib
-STRIP=$(CROSS_COMPILE)strip
+TEMP_DIR			=	/var/tmp
+ROOT_DIR			=	$(HOME_DIR)/$(PROJECT)
 
-CPPFLAGS=$(PROJECT_CPPFLAGS)
-CFLAGS=-g
-CXXFLAGS=-g
-ARFLAGS=rcv
-SOFLAGS=xv
-LDFLAGS=-g $(PROJECT_LDFLAGS) -lpthread -lrt -lm
+TIMESTAMP			=	$(shell date -u +%Y%m%d%H%M%S%N%Z)
+DATESTAMP			=	$(shell date +%Y%m%d)
+SVNURL				=	svn://graphite/$(PROJECT)/trunk/$(TITLE)
 
-################################################################################
-# DEFAULT
-################################################################################
+PROJECT_A			=	lib$(PROJECT).a
+PROJECTXX_A			=	lib$(PROJECT)xx.a
+PROJECT_SO			=	lib$(PROJECT).so
+PROJECTXX_SO		=	lib$(PROJECT)xx.so
 
-PHONY+=default
+PROJECT_LIB			=	$(PROJECT_SO).$(MAJOR).$(MINOR).$(BUILD)
+PROJECTXX_LIB		=	$(PROJECTXX_SO).$(MAJOR).$(MINOR).$(BUILD)
 
-default:	all
+UTILITIES			=	dbdi dcscope dgdb diminuto dlib
+GENERATED			=	vintage setup
+ALIASES				=	hex oct ntohs htons ntohl htonl
 
-################################################################################
-# MANIFESTS
-################################################################################
+TARGETOBJECTS		=	$(addprefix $(OUT)/,$(addsuffix .o,$(basename $(wildcard $(SRC_DIR)/*.c))))
+TARGETOBJECTSXX		=	$(addprefix $(OUT)/,$(addsuffix .o,$(basename $(wildcard $(SRC_DIR)/*.cpp))))
+TARGETDRIVERS		=	$(addprefix $(OUT)/,$(addsuffix .ko,$(basename $(wildcard $(DRV_DIR)/*.c))))
+TARGETMODULES		=	$(addprefix $(OUT)/,$(addsuffix .so,$(basename $(wildcard $(MOD_DIR)/*.c))))
+TARGETSCRIPTS		=	$(addprefix $(OUT)/,$(basename $(wildcard $(BIN_DIR)/*.sh)))
+TARGETBINARIES		=	$(addprefix $(OUT)/,$(basename $(wildcard $(BIN_DIR)/*.c)))
+TARGETGENERATED		=	$(addprefix $(OUT)/$(BIN_DIR)/,$(GENERATED))
+TARGETALIASES		=	$(addprefix $(OUT)/$(BIN_DIR)/,$(ALIASES))
+TARGETUNITTESTS		=	$(addprefix $(OUT)/,$(basename $(wildcard $(TST_DIR)/*.c)))
+TARGETUNITTESTS		+=	$(addprefix $(OUT)/,$(basename $(wildcard $(TST_DIR)/*.cpp)))
+TARGETUNITTESTS		+=	$(addprefix $(OUT)/,$(basename $(wildcard $(TST_DIR)/*.sh)))
 
-MANIFEST_H=\
- Begin.h \
- BufferInput.h \
- BufferOutput.h \
- CommonEra.h \
- CriticalSection.h \
- Constant.h \
- DataInput.h \
- Date.h \
- DateTime.h \
- DaylightSavingTime.h \
- DescriptorInput.h \
- DescriptorOutput.h \
- Desperado.h \
- DstAlways.h \
- DstEu.h \
- DstGeneric.h \
- DstNever.h \
- DstUs.h \
- DstUs1966.h \
- DstUs1986.h \
- DstUs2007.h \
- Dump.h \
- DumpInput.h \
- DumpOutput.h \
- End.h \
- Epoch.h \
- Exception.h \
- FileInput.h \
- FileOutput.h \
- Heap.h \
- Input.h \
- InputOutput.h \
- LeapSeconds.h \
- Linux.h \
- LocalTime.h \
- LogOutput.h \
- Logger.h \
- Mutex.h \
- Number.h \
- Object.h \
- Output.h \
- PathInput.h \
- PathOutput.h \
- Platform.h \
- Print.h \
- SyslogOutput.h \
- Ticks.h \
- Time.h \
- TimeStamp.h \
- TimeZone.h \
- Vintage.h \
- cxxcapi.h \
- assert.h \
- debug.h \
- errno.h \
- exceptions.h \
- generics.h \
- littleendian.h \
- lowtohigh.h \
- ready.h \
- release.h \
- stdarg.h \
- stdint.h \
- stdio.h \
- stdlib.h \
- string.h \
- target.h \
- types.h \
- int8_Number.h \
- int16_Number.h \
- int32_Number.h \
- int64_Number.h \
- uint8_Number.h \
- uint16_Number.h \
- uint32_Number.h \
- uint64_Number.h
+TARGETARCHIVE		=	$(OUT)/$(ARC_DIR)/$(PROJECT_A)
+TARGETARCHIVEXX		=	$(OUT)/$(ARC_DIR)/$(PROJECTXX_A)
+TARGETSHARED		=	$(OUT)/$(LIB_DIR)/$(PROJECT_SO).$(MAJOR).$(MINOR).$(BUILD)
+TARGETSHARED		+=	$(OUT)/$(LIB_DIR)/$(PROJECT_SO).$(MAJOR).$(MINOR)
+TARGETSHARED		+=	$(OUT)/$(LIB_DIR)/$(PROJECT_SO).$(MAJOR)
+TARGETSHARED		+=	$(OUT)/$(LIB_DIR)/$(PROJECT_SO)
+TARGETSHAREDXX		=	$(OUT)/$(LIB_DIR)/$(PROJECTXX_SO).$(MAJOR).$(MINOR).$(BUILD)
+TARGETSHAREDXX		+=	$(OUT)/$(LIB_DIR)/$(PROJECTXX_SO).$(MAJOR).$(MINOR)
+TARGETSHAREDXX		+=	$(OUT)/$(LIB_DIR)/$(PROJECTXX_SO).$(MAJOR)
+TARGETSHAREDXX		+=	$(OUT)/$(LIB_DIR)/$(PROJECTXX_SO)
 
-MANIFEST_CPP=\
- BufferInput.cpp \
- BufferOutput.cpp \
- CommonEra.cpp \
- CriticalSection.cpp \
- DataInput.cpp \
- Date.cpp \
- DateTime.cpp \
- DaylightSavingTime.cpp \
- DescriptorInput.cpp \
- DescriptorOutput.cpp \
- DstAlways.cpp \
- DstEu.cpp \
- DstGeneric.cpp \
- DstNever.cpp \
- DstUs.cpp \
- DstUs1966.cpp \
- DstUs1986.cpp \
- DstUs2007.cpp \
- Dump.cpp \
- DumpInput.cpp \
- DumpOutput.cpp \
- Epoch.cpp \
- FileInput.cpp \
- FileOutput.cpp \
- Heap.cpp \
- Input.cpp \
- InputOutput.cpp \
- LeapSeconds.cpp \
- Linux.cpp \
- LocalTime.cpp \
- LogOutput.cpp \
- Logger.cpp \
- Mutex.cpp \
- Number_int8.cpp \
- Number_int16.cpp \
- Number_int32.cpp \
- Number_int64.cpp \
- Number_uint8.cpp \
- Number_uint16.cpp \
- Number_uint32.cpp \
- Number_uint64.cpp \
- Object.cpp \
- Output.cpp \
- PathInput.cpp \
- PathOutput.cpp \
- Platform.cpp \
- PlatformApi.cpp \
- Print.cpp \
- SyslogOutput.cpp \
- Ticks.cpp \
- Time.cpp \
- TimeStamp.cpp \
- TimeZone.cpp \
- Vintage.cpp \
- ready.cpp \
- string.cpp \
- int8_Number.cpp \
- int16_Number.cpp \
- int32_Number.cpp \
- int64_Number.cpp \
- uint8_Number.cpp \
- uint16_Number.cpp \
- uint32_Number.cpp \
- uint64_Number.cpp
- 
-MANIFEST_ETC=\
- README.h
+TARGETLIBRARIES		=	$(TARGETARCHIVE) $(TARGETSHARED)
+TARGETLIBRARIESXX	=	$(TARGETARCHIVEXX) $(TARGETSHAREDXX)
+TARGETPROGRAMS		=	$(TARGETBINARIES) $(TARGETALIASES) $(TARGETUNITTESTS) $(TARGETGENERATED) $(TARGETSCRIPTS)
+TARGETDEFAULT		=	$(TARGETLIBRARIES) $(TARGETLIBRARIESXX) $(TARGETMODULES) $(TARGETPROGRAMS)
+TARGETPACKAGE		=	$(TARGETDEFAULT) $(TARGETDRIVERS)
+
+BUILDARTIFACTS		=	doxygen-local.cf $(ETC_DIR)/diminuto.sh dependencies.mk
+
+COMMAND				=	dummy
+SCRIPT				=	dummy
+
+CC					=	$(CROSS_COMPILE)gcc
+CXX					=	$(CROSS_COMPILE)g++
+AR					=	$(CROSS_COMPILE)ar
+RANLIB				=	$(CROSS_COMPILE)ranlib
+STRIP				=	$(CROSS_COMPILE)strip
+
+CDEFINES			=	-DCOM_DIAG_$(SYMBOL)_VINTAGE=\"$(VINTAGE)\"
+
+ARFLAGS				=	rcv
+CPPFLAGS			=	$(CPPARCH) -iquote $(SRC_DIR) -iquote $(INC_DIR) -isystem $(INCLUDE_DIR) $(CDEFINES)
+CXXFLAGS			=	$(CARCH) -fPIC -g
+CFLAGS				=	$(CARCH) -fPIC -g
+#CXXFLAGS			=	$(CARCH) -fPIC -O3
+#CFLAGS				=	$(CARCH) -fPIC -O3
+CPFLAGS				=	-i
+MVFLAGS				=	-i
+LDFLAGS				=	$(LDARCH) -L$(OUT)/lib -l$(PROJECT) -lpthread -lrt -ldl
+LDXXFLAGS			=	$(LDARCH) -L$(OUT)/lib -l$(PROJECT)xx -l$(PROJECT) -lpthread -lrt -ldl
+
+BROWSER				=	firefox
+
+########## Main Entry Points
+
+.PHONY:	default all dist clean pristine
+
+default:	$(TARGETDEFAULT)
+
+all:	$(UTILITIES) $(TARGETPACKAGE)
+
+dist:	distribution
+
+clean:
+	rm -rf $(OUT) $(UTILITIES) $(BUILDARTIFACTS)
+	rm -rf $(DOC_DIR)
+
+pristine:	clean
+	rm -rf $(OUT_DIR)
+
+########## Distribution
+
+.PHONY:	distribution
+
+distribution:
+	rm -rf $(TEMP_DIR)/$(PROJECT)-$(MAJOR).$(MINOR).$(BUILD)
+	svn export $(SVNURL) $(TEMP_DIR)/$(PROJECT)-$(MAJOR).$(MINOR).$(BUILD)
+	( cd $(TEMP_DIR); tar cvzf - $(PROJECT)-$(MAJOR).$(MINOR).$(BUILD) ) > $(TEMP_DIR)/$(PROJECT)-$(MAJOR).$(MINOR).$(BUILD).tgz
+	( cd $(TEMP_DIR)/$(PROJECT)-$(MAJOR).$(MINOR).$(BUILD); make TARGET=host; ./out/host/bin/vintage )
+
+########## Host Utilities
+
+%:	$(ETC_DIR)/%.sh
+	cp $< $@
+	chmod 755 $@
+
+$(ETC_DIR)/diminuto.sh:	Makefile
+	echo "# GENERATED FILE! DO NOT EDIT!" > $@
+	echo ARCH=\"$(ARCH)\" >> $@
+	echo BDIADDRESS=\"$(BDI_IPADDR)\" >> $@
+	echo BDIPORT=\"$(BDI_PORT)\" >> $@
+	echo BINARIES=\"$(BINARIES_DIR)\" >> $@
+	echo BUILDROOT=\"$(BUILDROOT_DIR)\" >> $@
+	echo CONFIG=\"$(CONFIG_DIR)\" >> $@
+	echo CROSS_COMPILE=\"$(CROSS_COMPILE)\" >> $@
+	echo DATESTAMP=\"$(DATESTAMP)\" >> $@
+	echo TOOLCHAIN=\"$(TOOLCHAIN_DIR)\" >> $@
+	echo DIMINUTO=\"$(DIMINUTO_DIR)\" >> $@
+	echo DESPERADO=\"$(DESPERADO_DIR)\" >> $@
+	echo FICL=\"$(FICL_DIR)\" >> $@
+	echo IMAGE=\"$(IMAGE)\" >> $@
+	echo KERNEL=\"$(KERNEL_DIR)\" >> $@
+	echo PLATFORM=\"$(PLATFORM)\" >> $@
+	echo PROJECT=\"$(PROJECT)\" >> $@
+	echo RELEASE=\"$(KERNEL_REV)\" >> $@
+	echo TARGET=\"$(TARGET)\" >> $@
+	echo TFTP=\"$(TFTP_DIR)\" >> $@
+	echo TGTADDRESS=\"$(TGT_IPADDR)\" >> $@
+	echo TMPDIR=\"$(TEMP_DIR)\" >> $@
+	echo 'echo $${PATH} | grep -q "$(TOOLBIN_DIR)" || export PATH=$(TOOLBIN_DIR):$${PATH}' >> $@
+	echo 'echo $${PATH} | grep -q "$(LOCALBIN_DIR)" || export PATH=$(LOCALBIN_DIR):$${PATH}' >> $@
+
+########## Target C Libraries
+
+$(OUT)/$(ARC_DIR)/lib$(PROJECT).a:	$(TARGETOBJECTS)
+	test -d $(OUT)/$(ARC_DIR) || mkdir -p $(OUT)/$(ARC_DIR)
+	$(AR) $(ARFLAGS) $@ $^
+	$(RANLIB) $@
+
+$(OUT)/$(LIB_DIR)/lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD):	$(OUT)/$(ARC_DIR)/lib$(PROJECT).a
+	test -d $(OUT)/$(LIB_DIR) || mkdir -p $(OUT)/$(LIB_DIR)
+	$(CC) $(CARCH) -shared -Wl,-soname,lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD) -o $@ -Wl,--whole-archive $< -Wl,--no-whole-archive
+
+$(OUT)/$(LIB_DIR)/lib$(PROJECT).so:	$(OUT)/$(LIB_DIR)/lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD)
+	D=`dirname $<`; F=`basename $<`; T=`basename $@`; ( cd $$D; ln -s -f $$F $$T ) 
+
+$(OUT)/$(LIB_DIR)/lib$(PROJECT).so.$(MAJOR):	$(OUT)/$(LIB_DIR)/lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD)
+	D=`dirname $<`; F=`basename $<`; T=`basename $@`; ( cd $$D; ln -s -f $$F $$T ) 
+
+$(OUT)/$(LIB_DIR)/lib$(PROJECT).so.$(MAJOR).$(MINOR):	$(OUT)/$(LIB_DIR)/lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD)
+	D=`dirname $<`; F=`basename $<`; T=`basename $@`; ( cd $$D; ln -s -f $$F $$T ) 
 	
-MANIFEST_O=$(addprefix $(CORELC)/, $(addsuffix .o, $(basename $(MANIFEST_CPP))))
+########## Target C++ Libraries
 
-################################################################################
-# REFRESH
-################################################################################
+$(OUT)/$(ARC_DIR)/lib$(PROJECT)xx.a:	$(TARGETOBJECTSXX)
+	test -d $(OUT)/$(ARC_DIR) || mkdir -p $(OUT)/$(ARC_DIR)
+	$(AR) $(ARFLAGS) $@ $^
+	$(RANLIB) $@
 
-PHONY+=refresh
+$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR).$(BUILD):	$(OUT)/$(ARC_DIR)/lib$(PROJECT)xx.a
+	test -d $(OUT)/$(LIB_DIR) || mkdir -p $(OUT)/$(LIB_DIR)
+	$(CC) $(CARCH) -shared -Wl,-soname,lib$(PROJECT)xx.so.$(MAJOR).$(MINOR).$(BUILD) -o $@ -Wl,--whole-archive $< -Wl,--no-whole-archive
 
-# I use this to refresh the Desperadito sources against the core Desperado code
-# base. You will never need to do this unless you have downloaded your own
-# version of Desperado and have made changes to it.
+$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so:	$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR).$(BUILD)
+	D=`dirname $<`; F=`basename $<`; T=`basename $@`; ( cd $$D; ln -s -f $$F $$T ) 
 
-refresh:
-	( \
-		D=$(shell cd ../$(CORE); pwd); \
-		egrep '^(MAJOR|MINOR|BUILD)[[:space:]]*=' $$D/Makefile > release.mk; \
-		( for H in $(MANIFEST_H); do cp $$D/include/com/diag/$(CORELC)/$$H include/com/diag/$(CORELC)/$$H; done ); \
-		( for C in $(MANIFEST_CPP); do cp $$D/$$C $(CORELC)/$$C; done ); \
-		( for E in $(MANIFEST_ETC); do cp $$D/$$E $$E; done ); \
-	)
+$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR):	$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR).$(BUILD)
+	D=`dirname $<`; F=`basename $<`; T=`basename $@`; ( cd $$D; ln -s -f $$F $$T ) 
+
+$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR):	$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR).$(BUILD)
+	D=`dirname $<`; F=`basename $<`; T=`basename $@`; ( cd $$D; ln -s -f $$F $$T ) 
+
+########## Target Unstripped Binaries
+
+$(OUT)/$(SYM_DIR)/%:	$(BIN_DIR)/%.c $(TARGETLIBRARIES)
+	test -d $(OUT)/$(SYM_DIR) || mkdir -p $(OUT)/$(SYM_DIR)
+	$(CC) $(CPPFLAGS) -I $(KERNEL_DIR)/include $(CFLAGS) -o $@ $< $(LDFLAGS)
 	
--include release.mk
+########## Target Aliases
 
-################################################################################
-# BUILD
-################################################################################
-
-TARGETS+=include/com/diag/$(CORELC)
-TARGETS+=$(CORELC)
-
-TARGETS+=$(MANIFEST_O)
-ARTIFACTS+=$(MANIFEST_O)
-ARCHIVABLE+=$(MANIFEST_O)
-
-################################################################################
-# DIRECTORIES
-################################################################################
-
-include/com/diag/$(CORELC):
-	mkdir -p $@
+$(OUT)/$(BIN_DIR)/hex $(OUT)/$(BIN_DIR)/oct $(OUT)/$(BIN_DIR)/ntohs $(OUT)/$(BIN_DIR)/htons $(OUT)/$(BIN_DIR)/ntohl $(OUT)/$(BIN_DIR)/htonl:	$(OUT)/$(BIN_DIR)/dec
+	ln -f $< $@
 	
-$(CORELC):
-	mkdir -p $@
+########## Unit Tests
 
-################################################################################
-# LIBRARIES AND SHARED OBJECTS
-################################################################################
+$(OUT)/$(TST_DIR)/%:	$(TST_DIR)/%.c $(TARGETLIBRARIES)
+	test -d $(OUT)/$(TST_DIR) || mkdir -p $(OUT)/$(TST_DIR)
+	$(CC) -rdynamic $(CPPFLAGS) $(CFLAGS) -o $@ $< $(LDFLAGS)
+	
+$(OUT)/$(TST_DIR)/%:	$(TST_DIR)/%.cpp $(TARGETLIBRARIESXX) $(TARGETLIBRARIES)
+	test -d $(OUT)/$(TST_DIR) || mkdir -p $(OUT)/$(TST_DIR)
+	$(CXX) -rdynamic $(CPPFLAGS) $(CXXFLAGS) -o $@ $< $(LDXXFLAGS)
 
-TARGETS+=lib$(PROJECT).a
-DELIVERABLES+=lib$(PROJECT).a
+########## Generated
 
-lib$(PROJECT).a:	$(ARCHIVABLE)
-	$(AR) $(ARFLAGS) lib$(PROJECT).a $(ARCHIVABLE)
-	$(RANLIB) lib$(PROJECT).a
+.PHONY:	$(OUT)/$(GEN_DIR)/vintage.c $(INC_DIR)/com/diag/$(PROJECT)/$(PROJECT)_release.h $(INC_DIR)/com/diag/$(PROJECT)/$(PROJECT)_vintage.h
 
-TARGETS+=lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD)
-DELIVERABLES+=lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD)
+# For embedding in a system where it can be executed from a shell.
+# The major.minor.build is emitted to standard output, a bunch more
+# metadata to standard error. Hence, they can be redirected to separate
+# files. The metadata file is intended to parsable as a standard properties
+# file (although I have not tried it).
+$(OUT)/$(GEN_DIR)/vintage.c:	$(INC_DIR)/com/diag/$(PROJECT)/$(PROJECT)_release.h $(INC_DIR)/com/diag/$(PROJECT)/$(PROJECT)_vintage.h Makefile
+	D=`dirname $@`; test -d $$D || mkdir -p $$D	
+	echo '/* GENERATED FILE! DO NOT EDIT! */' > $@
+	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_release.h"' >> $@
+	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_release.h"' >> $@
+	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_vintage.h"' >> $@
+	echo '#include "com/diag/$(PROJECT)/$(PROJECT)_vintage.h"' >> $@
+	echo '#include <stdio.h>' >> $@
+	echo 'static const char METADATA[] =' >> $@
+	echo "\"Title = $(TITLE)\\n\"" >> $@
+	echo "\"Copyright = $(COPYRIGHT)\\n\"" >> $@
+	echo "\"Contact = $(CONTACT)\\n\"" >> $@
+	echo "\"License = $(LICENSE)\\n\"" >> $@
+	echo "\"Homepage = $(HOMEPAGE)\\n\"" >> $@
+	echo "\"Release = $(MAJOR).$(MINOR).$(BUILD)\\n\"" >> $@
+	echo "\"Vintage = $(VINTAGE)\\n\"" >> $@
+	echo "\"Host = $(shell hostname)\\n\"" >> $@
+	echo "\"Directory = $(shell pwd)\\n\"" >> $@
+	echo "\"Arch = $(ARCH)\\n\"" >> $@
+	echo "\"Target = $(TARGET)\\n\"" >> $@
+	echo "\"Platform = $(PLATFORM)\\n\"" >> $@
+	echo "\"Toolchain = $(TOOLCHAIN)\\n\"" >> $@
+	$(VINFO) | awk '/^$$/ { next; } { gsub(/\"/, "\\\"", $$0); colon = index($$0, ":"); keyword = substr($$0, 1, colon - 1); value = substr($$0, colon + 1); gsub(/ /, "\\\\\\\\ ", keyword); print "\"" keyword " =" value "\\n\""; }' >> $@ || true
+	echo ';' >> $@
+	echo 'int main(void) { fputs(METADATA, stderr); fputs("$(MAJOR).$(MINOR).$(BUILD)\n", stdout); return 0; }' >> $@
 
-lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD):	lib$(PROJECT).a
-	HERE="`pwd`"; \
-	THERE="`mktemp -d $(TMP)/$(PROJECT).XXXXXXXXXX`"; \
-	( cd $$THERE; $(AR) $(SOFLAGS) $$HERE/lib$(PROJECT).a ); \
-	$(CC) $(CARCH) -shared -Wl,-soname,lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD) -o lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD) $$THERE/*.o; \
-	rm -rf $$THERE
+# For embedding in an application where it can be interrogated or displayed.
+$(INC_DIR)/com/diag/$(PROJECT)/$(PROJECT)_release.h:
+	D=`dirname $@`; test -d $$D || mkdir -p $$D	
+	echo '/* GENERATED FILE! DO NOT EDIT! */' > $@
+	echo '#ifndef _H_COM_DIAG_$(SYMBOL)_RELEASE_' >> $@
+	echo '#define _H_COM_DIAG_$(SYMBOL)_RELEASE_' >> $@
+	echo "static const char RELEASE[] = \"RELEASE=$(MAJOR).$(MINOR).$(BUILD)\";" >> $@
+	echo '#endif' >> $@
 
-TARGETS+=lib$(PROJECT).so.$(MAJOR).$(MINOR)
-DELIVERABLES+=lib$(PROJECT).so.$(MAJOR).$(MINOR)
+# For embedding in an application where it can be interrogated or displayed.
+$(INC_DIR)/com/diag/$(PROJECT)/$(PROJECT)_vintage.h:
+	D=`dirname $@`; test -d $$D || mkdir -p $$D	
+	echo '/* GENERATED FILE! DO NOT EDIT! */' > $@
+	echo '#ifndef _H_COM_DIAG_$(SYMBOL)_VINTAGE_' >> $@
+	echo '#define _H_COM_DIAG_$(SYMBOL)_VINTAGE_' >> $@
+	echo "static const char VINTAGE[] = \"VINTAGE=$(VINTAGE)\";" >> $@
+	echo '#endif' >> $@
 
-lib$(PROJECT).so.$(MAJOR).$(MINOR):	lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD)
-	ln -s -f lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD) lib$(PROJECT).so.$(MAJOR).$(MINOR)
+$(OUT)/$(SYM_DIR)/vintage:	$(OUT)/$(GEN_DIR)/vintage.c
+	D=`dirname $@`; test -d $$D || mkdir -p $$D	
+	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $<
 
-TARGETS+=lib$(PROJECT).so.$(MAJOR)
-DELIVERABLES+=lib$(PROJECT).so.$(MAJOR)
+# For sourcing into a bash shell (for example, ". setup").
+$(OUT)/$(BIN_DIR)/setup:	Makefile
+	D=`dirname $@`; test -d $$D || mkdir -p $$D	
+	echo 'COM_DIAG_$(SYMBOL)_PATH=`dirname $${BASH_ARGV[0]}`; COM_DIAG_$(SYMBOL)_ROOT=`cd $$COM_DIAG_$(SYMBOL)_PATH; pwd`' > $@
+	echo 'export PATH=$$PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../bin:$$COM_DIAG_$(SYMBOL)_ROOT/../tst' >> $@
+	echo 'export LD_DRIVER_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../drv' >> $@
+	echo 'export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../lib' >> $@
+	echo 'export LD_MODULE_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../mod' >> $@
 
-lib$(PROJECT).so.$(MAJOR):	lib$(PROJECT).so.$(MAJOR).$(MINOR)
-	ln -s -f lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD) lib$(PROJECT).so.$(MAJOR)
+########## User-Space Loadable Modules
 
-TARGETS+=lib$(PROJECT).so
-DELIVERABLES+=lib$(PROJECT).so
+LDWHOLEARCHIVES=# These archives will be linked into the shared object in their entirety.
 
-lib$(PROJECT).so:	lib$(PROJECT).so.$(MAJOR)
-	ln -s -f lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD) lib$(PROJECT).so
+$(OUT)/$(MOD_DIR)/%.so:	$(MOD_DIR)/%.c
+	test -d $(OUT)/$(MOD_DIR) || mkdir -p $(OUT)/$(MOD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ -shared $< $(LDFLAGS) -Wl,--whole-archive $(LDWHOLEARCHIVES) -Wl,--no-whole-archive
 
-################################################################################
-# PATTERNS
-################################################################################
+########## Kernel-Space Loadable Modules
 
-%.txt:	%.cpp
-	$(CXX) -E $(CPPFLAGS) -c $< > $*.txt
+.PHONY:	drivers drivers-clean
 
-%.o:	%.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $@ -c $<
+OBJ_M =	$(addsuffix .o,$(basename $(shell cd $(DRV_DIR); ls *.c)))
 
-%.txt:	%.c
-	$(CC) -E $(CPPFLAGS) -c $< > $*.txt
+$(OUT)/$(SYS_DIR)/Makefile:	Makefile
+	D=`dirname $@`; test -d $$D || mkdir -p $$D	
+	echo "# GENERATED FILE! DO NOT EDIT!" > $@
+	echo "obj-m := $(OBJ_M)" >> $@
+	echo "EXTRA_CFLAGS := -iquote $(HERE)/$(INC_DIR) -iquote $(HERE)/$(TST_DIR)" >> $@
+	#echo "EXTRA_CFLAGS := -iquote $(HERE)/$(INC_DIR) -iquote $(HERE)/$(TST_DIR) -DDEBUG" >> $@
 
-%.o:	%.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
+$(OUT)/$(SYS_DIR)/%.c:	$(DRV_DIR)/%.c
+	D=`dirname $@`; test -d $$D || mkdir -p $$D	
+	cp $< $@
 
-%:	%_unstripped
-	$(STRIP) -o $@ $<
+$(OUT)/$(DRV_DIR)/%.ko:	$(OUT)/$(SYS_DIR)/%.ko
+	D=`dirname $@`; test -d $$D || mkdir -p $$D	
+	cp $< $@
 
-################################################################################
-# DEPENDENCIES
-################################################################################
+drivers $(OUT)/$(SYS_DIR)/diminuto_mmdriver.ko $(OUT)/$(SYS_DIR)/diminuto_utmodule.ko $(OUT)/$(SYS_DIR)/diminuto_kernel_datum.ko $(OUT)/$(SYS_DIR)/diminuto_kernel_map.ko:	$(OUT)/$(SYS_DIR)/Makefile $(OUT)/$(SYS_DIR)/diminuto_mmdriver.c $(OUT)/$(SYS_DIR)/diminuto_utmodule.c $(OUT)/$(SYS_DIR)/diminuto_kernel_datum.c $(OUT)/$(SYS_DIR)/diminuto_kernel_map.c
+	make -C $(KERNEL_DIR) M=$(shell cd $(OUT)/$(SYS_DIR); pwd) CROSS_COMPILE=$(CROSS_COMPILE) ARCH=$(ARCH) modules
 
-PHONY+=depend
+drivers-clean:
+	make -C $(KERNEL_DIR) M=$(shell cd $(OUT)/$(SYS_DIR); pwd) CROSS_COMPILE=$(CROSS_COMPILE) ARCH=$(ARCH) clean
+	rm -f $(OUT)/$(SYS_DIR)/Makefile
 
-ARTIFACTS+=dependencies.mk
+########## Helpers
 
-# This is a lot more difficult than it ought to be.
+.PHONY:	backup package implicit
 
-DEPENDS_C:=${shell find . -type f \( -name '*.c' -o -name '*.cpp' \) -print}
-DEPENDS_H:=${shell find . -type f -name '*.h' -print}
+backup:	../$(PROJECT).bak.tgz
+	mv $(MVFLAGS) ../$(PROJECT).bak.tgz ../$(PROJECT).$(TIMESTAMP).tgz
 
-depend dependencies.mk:	$(DEPENDS_C) $(DEPENDS_H)
-	cp /dev/null dependencies.mk
-	for F in $(DEPENDS_C); do \
-		D=`dirname $$F | sed "s/^\.\///"`; \
-		echo -n "$$D/" >> dependencies.mk; \
-		$(CXX) $(CPPFLAGS) -MM -MG $$F >> dependencies.mk; \
-	done
+../$(PROJECT).bak.tgz:
+	tar cvzf - . > $@
 
-include dependencies.mk
+TARGETMANIFEST = ./bin ./drv ./lib ./mod ./tst
 
-################################################################################
-# DISTRIBUTION
-################################################################################
+package $(PROJECT).tgz:
+	tar -C $(OUT) -cvzf - $(TARGETMANIFEST) > $(PROJECT).tgz
+	
+implicit:
+	$(CC) $(CPPFLAGS) $(CFLAGS) -dM -E - < /dev/null
 
-PHONY+=dist
+########## Documentation
 
-ARTIFACTS+=$(PROJECT)-$(MAJOR).$(MINOR).$(BUILD).tgz
-
-dist $(PROJECT)-$(MAJOR).$(MINOR).$(BUILD).tgz:
-	TARDIR=$(shell mktemp -d /tmp/$(PROJECT).XXXXXXXXXX); \
-	svn export $(SVN_URL) $$TARDIR/$(PROJECT)-$(MAJOR).$(MINOR).$(BUILD); \
-	tar -C $$TARDIR -cvzf - $(PROJECT)-$(MAJOR).$(MINOR).$(BUILD) > $(PROJECT)-$(MAJOR).$(MINOR).$(BUILD).tgz; \
-	rm -rf $$TARDIR
-
-################################################################################
-# DOCUMENTATION
-################################################################################
-
-DOC_DIR=doc
-BROWSER=firefox
-
-PHONY+=documentation browse refman manpages
-DELIVERABLES+=$(DOC_DIR)
+.PHONY:	documentation browse refman manpages
 
 documentation:
-	mkdir -p $(DOC_DIR)/latex $(DOC_DIR)/man $(DOC_DIR)/pdf
 	sed -e "s/\\\$$Name.*\\\$$/$(MAJOR).$(MINOR).$(BUILD)/" < doxygen.cf > doxygen-local.cf
 	doxygen doxygen-local.cf
+	test -d $(DOC_DIR)/pdf || mkdir -p $(DOC_DIR)/pdf
 	( cd $(DOC_DIR)/latex; $(MAKE) refman.pdf; cp refman.pdf ../pdf )
 	cat $(DOC_DIR)/man/man3/*.3 | groff -man -Tps - > $(DOC_DIR)/pdf/manpages.ps
 	ps2pdf $(DOC_DIR)/pdf/manpages.ps $(DOC_DIR)/pdf/manpages.pdf
@@ -400,22 +441,61 @@ refman:
 manpages:
 	$(BROWSER) file:doc/pdf/manpages.pdf
 
-################################################################################
-# ENTRY POINTS
-################################################################################
+########## Submakes
 
-PHONY+=all clean clobber pristine
+.PHONY:	patch
 
-all:	$(TARGETS)
+patch:	$(OLD) $(NEW)
+	diff -purN $(OLD) $(NEW)
 
-clean:
-	rm -rf $(ARTIFACTS)
+########## Rules
+
+$(OUT)/%.txt:	%.cpp
+	D=`dirname $@`; test -d $$D || mkdir -p $$D
+	$(CXX) -E $(CPPFLAGS) -c $< > $@
+
+$(OUT)/%.o:	%.cpp
+	D=`dirname $@`; test -d $$D || mkdir -p $$D
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $@ -c $<
+
+$(OUT)/%.txt:	%.c
+	D=`dirname $@`; test -d $$D || mkdir -p $$D
+	$(CC) -E $(CPPFLAGS) -c $< > $@
+
+$(OUT)/%.o:	%.c
+	D=`dirname $@`; test -d $$D || mkdir -p $$D
+	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
+
+$(OUT)/%:	%.sh
+	D=`dirname $@`; test -d $$D || mkdir -p $$D
+	cp $< $@
+	chmod 755 $@
 	
-clobber:	clean
-	rm -rf $(DELIVERABLES)
+.SECONDARY:
 
-################################################################################
-# END
-################################################################################
+$(OUT)/$(BIN_DIR)/%:	$(OUT)/$(SYM_DIR)/%
+	D=`dirname $@`; test -d $$D || mkdir -p $$D
+	$(STRIP) -o $@ $<
 
-.PHONY:	$(PHONY)
+########## Dependencies
+
+.PHONY:	depend
+
+depend:
+	cp /dev/null dependencies.mk
+	for S in $(SRC_DIR) $(MOD_DIR) $(DRV_DIR) $(TST_DIR); do \
+		for F in $$S/*.c; do \
+			D=`dirname $$F`; \
+			echo -n "$(OUT)/$$D/" >> dependencies.mk; \
+			$(CC) $(CPPFLAGS) -MM -MG $$F >> dependencies.mk; \
+		done; \
+	done
+	for S in $(SRC_DIR) $(TST_DIR); do \
+		for F in $$S/*.cpp; do \
+			D=`dirname $$F`; \
+			echo -n "$(OUT)/$$D/" >> dependencies.mk; \
+			$(CXX) $(CPPFLAGS) -MM -MG $$F >> dependencies.mk; \
+		done; \
+	done
+
+-include dependencies.mk
