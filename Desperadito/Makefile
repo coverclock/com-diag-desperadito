@@ -6,7 +6,7 @@
 
 PROJECT				=	desperadito
 TITLE				=	Desperadito
-SYMBOL				=	DESPERADITO
+SYMBOL				=	DESPERADO
 
 ########## Customizations
 
@@ -58,6 +58,7 @@ HOME_DIR			=	$(HOME)/projects
 ifeq ($(TARGET),cobbler)# Build for the Raspberry Pi version B with the Raspbian system.
 ARCH				=	arm
 PLATFORM			=	linux
+PLATFORM_CLASS		=	Linux
 CPPARCH				=
 CARCH				=	
 #LDARCH				=	-static
@@ -72,6 +73,7 @@ endif
 ifeq ($(TARGET),host)# Build for an Intel build server with the Ubuntu kernel.
 ARCH				=	i386
 PLATFORM			=	linux
+PLATFORM_CLASS		=	Linux
 CPPARCH				=
 CARCH				=
 LDARCH				=
@@ -121,9 +123,9 @@ PROJECTXX_SO		=	lib$(PROJECT)xx.so
 PROJECT_LIB			=	$(PROJECT_SO).$(MAJOR).$(MINOR).$(BUILD)
 PROJECTXX_LIB		=	$(PROJECTXX_SO).$(MAJOR).$(MINOR).$(BUILD)
 
-UTILITIES			=	dbdi dcscope dgdb diminuto dlib
+UTILITIES			=	
 GENERATED			=	vintage setup
-ALIASES				=	hex oct ntohs htons ntohl htonl
+ALIASES				=	
 
 TARGETOBJECTS		=	$(addprefix $(OUT)/,$(addsuffix .o,$(basename $(wildcard $(SRC_DIR)/*.c))))
 TARGETOBJECTSXX		=	$(addprefix $(OUT)/,$(addsuffix .o,$(basename $(wildcard $(SRC_DIR)/*.cpp))))
@@ -165,7 +167,15 @@ AR					=	$(CROSS_COMPILE)ar
 RANLIB				=	$(CROSS_COMPILE)ranlib
 STRIP				=	$(CROSS_COMPILE)strip
 
-CDEFINES			=	-DCOM_DIAG_$(SYMBOL)_VINTAGE=\"$(VINTAGE)\"
+CDEFINES			=	-DCOM_DIAG_$(SYMBOL)_VINTAGE=\"$(VINTAGE)\" \
+						-DDESPERADO_TARGET_IS_$(TARGET) \
+						-DDESPERADO_TARGET_NAME="\"$(TARGET)\"" \
+						-DDESPERADO_PLATFORM_IS_$(PLATFORM_CLASS) \
+						-DDESPERADO_PLATFORM_NAME="\"$(PLATFORM_CLASS)\""  \
+						-DDESPERADO_PLATFORM_CLASS=$(PLATFORM_CLASS) \
+						-DDESPERADO_HAS_SYSLOG \
+						-D_REENTRANT \
+						-D_GNU_SOURCE
 
 ARFLAGS				=	rcv
 CPPFLAGS			=	$(CPPARCH) -iquote $(SRC_DIR) -iquote $(INC_DIR) -isystem $(INCLUDE_DIR) $(CDEFINES)
@@ -483,14 +493,7 @@ $(OUT)/$(BIN_DIR)/%:	$(OUT)/$(SYM_DIR)/%
 
 depend:
 	cp /dev/null dependencies.mk
-	for S in $(SRC_DIR) $(MOD_DIR) $(DRV_DIR) $(TST_DIR); do \
-		for F in $$S/*.c; do \
-			D=`dirname $$F`; \
-			echo -n "$(OUT)/$$D/" >> dependencies.mk; \
-			$(CC) $(CPPFLAGS) -MM -MG $$F >> dependencies.mk; \
-		done; \
-	done
-	for S in $(SRC_DIR) $(TST_DIR); do \
+	for S in $(SRC_DIR); do \
 		for F in $$S/*.cpp; do \
 			D=`dirname $$F`; \
 			echo -n "$(OUT)/$$D/" >> dependencies.mk; \
