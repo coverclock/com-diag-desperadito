@@ -493,7 +493,7 @@ $(OUT)/$(BIN_DIR)/%:	$(OUT)/$(SYM_DIR)/%
 
 depend:
 	cp /dev/null dependencies.mk
-	for S in $(SRC_DIR) $(TST_DIR); do \
+	for S in $(SRC_DIR) $(TST_DIR) $(BIN_DIR); do \
 		for F in $$S/*.cpp; do \
 			D=`dirname $$F`; \
 			echo -n "$(OUT)/$$D/" >> dependencies.mk; \
