@@ -1,8 +1,8 @@
-# Copyright 2008-2013 Digital Aggregates Corporation, Colorado, USA
+# Copyright 2013 Digital Aggregates Corporation, Colorado, USA
 # Licensed under the terms in README.h
 # Chip Overclock
 # mailto:coverclock@diag.com
-# http://www.diag.com/navigation/downloads/Diminuto.html
+# http://www.diag.com/navigation/downloads/Desperadito.html
 
 PROJECT				=	desperadito
 TITLE				=	Desperadito
