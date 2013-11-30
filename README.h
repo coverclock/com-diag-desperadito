@@ -51,7 +51,7 @@ ABSTRACT
 This file is part of the Digital Aggregates Corporation Desperadito
 library. Desperadito is an open source library of object-oriented
 software components written in C++. It implements design patterns
-that the author(s) has found to be both useful in embedded applications.
+that the author has found to be both useful in embedded applications.
 
 Desperadito is a mashup of code from the Digital Aggregates projects
 Desperado and Hayloft with the build system from Diminuto. Why? Because
