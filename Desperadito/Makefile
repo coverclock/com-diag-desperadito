@@ -91,6 +91,7 @@ BIN_DIR				=	bin# Stripped executable binaries
 DOC_DIR				=	doc# Documentation
 ETC_DIR				=	etc# Miscellaneous files
 GEN_DIR				=	gen# Generated files
+GOT_DIR				=	got# Google Test files
 INC_DIR				=	inc# Header files
 LIB_DIR				=	lib# Shared objects
 OUT_DIR				=	out# Build artifacts
@@ -116,8 +117,10 @@ SVNURL				=	svn://graphite/$(PROJECT)/trunk/$(TITLE)
 
 PROJECT_A			=	lib$(PROJECT).a
 PROJECTXX_A			=	lib$(PROJECT)xx.a
+PROJECTUT_A			=	lib$(PROJECT)ut.a
 PROJECT_SO			=	lib$(PROJECT).so
 PROJECTXX_SO		=	lib$(PROJECT)xx.so
+PROJECTUT_SO		=	lib$(PROJECT)ut.so
 
 PROJECT_LIB			=	$(PROJECT_SO).$(MAJOR).$(MINOR).$(BUILD)
 PROJECTXX_LIB		=	$(PROJECTXX_SO).$(MAJOR).$(MINOR).$(BUILD)
@@ -128,6 +131,8 @@ ALIASES				=
 
 TARGETOBJECTS		=	$(addprefix $(OUT)/,$(addsuffix .o,$(basename $(wildcard $(SRC_DIR)/*.c))))
 TARGETOBJECTSXX		=	$(addprefix $(OUT)/,$(addsuffix .o,$(basename $(wildcard $(SRC_DIR)/*.cpp))))
+TARGETOBJECTSUT		=	$(addprefix $(OUT)/,$(addsuffix .o,$(basename $(wildcard $(UTF_DIR)/*.c))))
+TARGETOBJECTSUTXX	+=	$(addprefix $(OUT)/,$(addsuffix .o,$(basename $(wildcard $(UTF_DIR)/*.cpp))))
 TARGETSCRIPTS		=	$(addprefix $(OUT)/,$(basename $(wildcard $(BIN_DIR)/*.sh)))
 TARGETBINARIES		=	$(addprefix $(OUT)/,$(basename $(wildcard $(BIN_DIR)/*.c)))
 TARGETGENERATED		=	$(addprefix $(OUT)/$(BIN_DIR)/,$(GENERATED))
@@ -149,10 +154,10 @@ TARGETSHAREDXX		=	$(OUT)/$(LIB_DIR)/$(PROJECTXX_SO).$(MAJOR).$(MINOR).$(BUILD)
 TARGETSHAREDXX		+=	$(OUT)/$(LIB_DIR)/$(PROJECTXX_SO).$(MAJOR).$(MINOR)
 TARGETSHAREDXX		+=	$(OUT)/$(LIB_DIR)/$(PROJECTXX_SO).$(MAJOR)
 TARGETSHAREDXX		+=	$(OUT)/$(LIB_DIR)/$(PROJECTXX_SO)
-TARGETSHAREDUT		=	$(OUT)/$(LIB_DIR)/$(PROJECTUT_A).$(MAJOR).$(MINOR).$(BUILD)
-TARGETSHAREDUT		+=	$(OUT)/$(LIB_DIR)/$(PROJECTUT_A).$(MAJOR).$(MINOR)
-TARGETSHAREDUT		+=	$(OUT)/$(LIB_DIR)/$(PROJECTUT_A).$(MAJOR)
-TARGETSHAREDUT		+=	$(OUT)/$(LIB_DIR)/$(PROJECTUT_A)
+TARGETSHAREDUT		=	$(OUT)/$(LIB_DIR)/$(PROJECTUT_SO).$(MAJOR).$(MINOR).$(BUILD)
+TARGETSHAREDUT		+=	$(OUT)/$(LIB_DIR)/$(PROJECTUT_SO).$(MAJOR).$(MINOR)
+TARGETSHAREDUT		+=	$(OUT)/$(LIB_DIR)/$(PROJECTUT_SO).$(MAJOR)
+TARGETSHAREDUT		+=	$(OUT)/$(LIB_DIR)/$(PROJECTUT_SO)
 
 TARGETLIBRARIES		=	$(TARGETARCHIVE) $(TARGETSHARED)
 TARGETLIBRARIESXX	=	$(TARGETARCHIVEXX) $(TARGETSHAREDXX) $(TARGETSHAREDUT)
@@ -189,8 +194,8 @@ CFLAGS				=	$(CARCH) -fPIC -g
 #CFLAGS				=	$(CARCH) -fPIC -O3
 CPFLAGS				=	-i
 MVFLAGS				=	-i
-LDFLAGS				=	$(LDARCH) -L$(OUT)/lib -l$(PROJECT)xx -l$(PROJECT) -lpthread -lrt -ldl
-LDXXFLAGS			=	$(LDARCH) -L$(OUT)/lib -l$(PROJECT)xx -l$(PROJECT) -lpthread -lrt -ldl
+LDFLAGS				=	$(LDARCH) -L$(OUT)/lib -l$(PROJECT)ut -l$(PROJECT) -lpthread -lrt -ldl
+LDXXFLAGS			=	$(LDARCH) -L$(OUT)/lib -l$(PROJECT)ut -l$(PROJECT)xx -l$(PROJECT) -lpthread -lrt -ldl
 
 BROWSER				=	firefox
 
@@ -295,22 +300,22 @@ $(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR):	$(OUT)/$(LIB_DIR)/lib$(P
 	
 ########## Target Unit Test Libraries
 
-$(OUT)/$(ARC_DIR)/lib$(PROJECT)xx.a:	$(TARGETOBJECTSUT)
+$(OUT)/$(ARC_DIR)/lib$(PROJECT)ut.a:	$(TARGETOBJECTSUT) $(TARGETOBJECTSUTXX)
 	test -d $(OUT)/$(ARC_DIR) || mkdir -p $(OUT)/$(ARC_DIR)
 	$(AR) $(ARFLAGS) $@ $^
 	$(RANLIB) $@
 
-$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR).$(BUILD):	$(OUT)/$(ARC_DIR)/lib$(PROJECT)xx.a
+$(OUT)/$(LIB_DIR)/lib$(PROJECT)ut.so.$(MAJOR).$(MINOR).$(BUILD):	$(OUT)/$(ARC_DIR)/lib$(PROJECT)ut.a
 	test -d $(OUT)/$(LIB_DIR) || mkdir -p $(OUT)/$(LIB_DIR)
-	$(CC) $(CARCH) -shared -Wl,-soname,lib$(PROJECT)xx.so.$(MAJOR).$(MINOR).$(BUILD) -o $@ -Wl,--whole-archive $< -Wl,--no-whole-archive
+	$(CC) $(CARCH) -shared -Wl,-soname,lib$(PROJECT)ut.so.$(MAJOR).$(MINOR).$(BUILD) -o $@ -Wl,--whole-archive $< -Wl,--no-whole-archive
 
-$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so:	$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR).$(BUILD)
+$(OUT)/$(LIB_DIR)/lib$(PROJECT)ut.so:	$(OUT)/$(LIB_DIR)/lib$(PROJECT)ut.so.$(MAJOR).$(MINOR).$(BUILD)
 	D=`dirname $<`; F=`basename $<`; T=`basename $@`; ( cd $$D; ln -s -f $$F $$T ) 
 
-$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR):	$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR).$(BUILD)
+$(OUT)/$(LIB_DIR)/lib$(PROJECT)ut.so.$(MAJOR):	$(OUT)/$(LIB_DIR)/lib$(PROJECT)ut.so.$(MAJOR).$(MINOR).$(BUILD)
 	D=`dirname $<`; F=`basename $<`; T=`basename $@`; ( cd $$D; ln -s -f $$F $$T ) 
 
-$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR):	$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR).$(BUILD)
+$(OUT)/$(LIB_DIR)/lib$(PROJECT)ut.so.$(MAJOR).$(MINOR):	$(OUT)/$(LIB_DIR)/lib$(PROJECT)ut.so.$(MAJOR).$(MINOR).$(BUILD)
 	D=`dirname $<`; F=`basename $<`; T=`basename $@`; ( cd $$D; ln -s -f $$F $$T ) 
 
 ########## Target Unstripped Binaries
