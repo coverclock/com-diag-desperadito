@@ -3,7 +3,7 @@
 
 ###############################################################################
 #
-#   Copyright 2006-2011 Digital Aggregates Corporation, Colorado, USA.
+#   Copyright 2006-2013 Digital Aggregates Corporation, Colorado, USA.
 #   This file is part of the Digital Aggregates Desperado library.
 #   
 #   This library is free software; you can redistribute it and/or
@@ -41,7 +41,6 @@
 TOTAL=0
 NAME="`basename $0`"
 PID=$$
-COMMANDPATH=.
 if [ "$TMPDIR" = "" ]; then
     TMPDIR="/var/tmp"
 fi
@@ -63,7 +62,7 @@ echo "$NAME[$PID]: $TS begin"
 
 # Errors in these commands do not count.
 cat << EOF > $SCRIPT1
-unittestassert
+mainassert
 EOF
 
 # Errors in these commands do count.
@@ -124,8 +123,8 @@ EOF
 cat $SCRIPT1 $SCRIPT2 $SCRIPT3 $SCRIPT4 | (
 	ERRORS=0
     while read COMMAND; do
-		echo $COMMAND
-        if [ ! -f $COMMAND ]; then
+		which $COMMAND
+        if [ $? -ne 0 ]; then
 			echo "$COMMAND: no such file!" 1>&2
         	ERRORS=`expr $ERRORS + 1`
 		fi
@@ -148,7 +147,7 @@ fi
     while read COMMAND; do
 		TS="`date -u +'%Y-%m-%dT%H:%M:%S.%N%Z'`"
         echo "$NAME[$PID]: $TS begin \"$COMMAND $ARGUMENTS\""
-        $COMMANDPATH/$COMMAND
+        $COMMAND
         RC=$?
 		TS="`date -u +'%Y-%m-%dT%H:%M:%S.%N%Z'`"
         echo "$NAME[$PID]: $TS end \"$COMMAND $ARGUMENTS\" errors=$RC"
@@ -167,7 +166,7 @@ echo "$NAME[$PID]: $TS errors=$TOTAL"
     while read COMMAND; do
 		TS="`date -u +'%Y-%m-%dT%H:%M:%S.%N%Z'`"
         echo "$NAME[$PID]: $TS begin \"$COMMAND $ARGUMENTS\""
-        $COMMANDPATH/$COMMAND
+        $COMMAND
         RC=$?
 		TS="`date -u +'%Y-%m-%dT%H:%M:%S.%N%Z'`"
         echo "$NAME[$PID]: $TS end \"$COMMAND $ARGUMENTS\" errors=$RC"
@@ -185,7 +184,7 @@ echo "$NAME[$PID]: $TS errors=$TOTAL"
     while read COMMAND; do
 		TS="`date -u +'%Y-%m-%dT%H:%M:%S.%N%Z'`"
         echo "$NAME[$PID]: $TS begin \"$COMMAND $ARGUMENTS\""
-        sh $COMMANDPATH/$COMMAND
+        $COMMAND
         RC=$?
 		TS="`date -u +'%Y-%m-%dT%H:%M:%S.%N%Z'`"
         echo "$NAME[$PID]: $TS end \"$COMMAND $ARGUMENTS\" errors=$RC"
@@ -204,7 +203,7 @@ echo "$NAME[$PID]: $TS errors=$TOTAL"
     while read COMMAND; do
         TS="`date -u +'%Y-%m-%dT%H:%M:%S.%N%Z'`"
         echo "$NAME[$PID]: $TS begin \"$COMMAND $ARGUMENTS\""
-        $COMMANDPATH/$COMMAND
+        $COMMAND
         RC=$?
         TS="`date -u +'%Y-%m-%dT%H:%M:%S.%N%Z'`"
         echo "$NAME[$PID]: $TS end \"$COMMAND $ARGUMENTS\" errors=$RC"
