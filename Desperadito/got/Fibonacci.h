@@ -13,7 +13,7 @@
 
 #include "gtest/gtest.h"
 #include "Fixture.h"
-#include "com/diag/Desperado/Fibonacci.h"
+#include "com/diag/desperado/Fibonacci.h"
 
 namespace com {
 namespace diag {

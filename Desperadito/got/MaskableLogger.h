@@ -12,7 +12,7 @@
  */
 
 #include "gtest/gtest.h"
-#include "com/diag/unittest/Fixture.h"
+#include "Fixture.h"
 #include "com/diag/desperado/MaskableLogger.h"
 #include "com/diag/desperado/FileOutput.h"
 #include "com/diag/desperado/LogOutput.h"
@@ -46,7 +46,7 @@ TEST_F(LoggerTest, Defaults) {
 	EXPECT_FALSE(mylogger.isEnabled(mylogger.EMERGENCY));
 	EXPECT_FALSE(mylogger.isEnabled(mylogger.PRINT));
 	/**/
-	EXPECT_EQ((Logger::Mask)0, mylogger.getMask());
+	EXPECT_EQ((MaskableLogger::Mask)0, mylogger.getMask());
 }
 
 TEST_F(LoggerTest, HeapAndShow) {
@@ -93,7 +93,7 @@ TEST_F(LoggerTest, EnableDisable) {
 	EXPECT_FALSE(mylogger.isEnabled(mylogger.EMERGENCY));
 	EXPECT_FALSE(mylogger.isEnabled(mylogger.PRINT));
 	/**/
-	EXPECT_EQ((Logger::Mask)0, mylogger.getMask());
+	EXPECT_EQ((MaskableLogger::Mask)0, mylogger.getMask());
 	for (int mask = 0; mask <= 0xffff; ++mask) {
 		LOGGER_TEST_ENABLEDISABLE_SET(mylogger.FINEST);
 		LOGGER_TEST_ENABLEDISABLE_SET(mylogger.FINER);
@@ -129,7 +129,7 @@ TEST_F(LoggerTest, EnableDisable) {
 		LOGGER_TEST_ENABLEDISABLE_TEST(mylogger.EMERGENCY);
 		LOGGER_TEST_ENABLEDISABLE_TEST(mylogger.PRINT);
 		/**/
-		EXPECT_EQ((Logger::Mask)mask, mylogger.getMask());
+		EXPECT_EQ((MaskableLogger::Mask)mask, mylogger.getMask());
 	}
 }
 
@@ -208,7 +208,7 @@ TEST_F(LoggerTest, Initialization) {
 		LOGGER_TEST_ENABLEDISABLE_TEST(mylogger.EMERGENCY);
 		LOGGER_TEST_ENABLEDISABLE_TEST(mylogger.PRINT);
 		/**/
-		EXPECT_EQ((Logger::Mask)mask, mylogger.getMask());
+		EXPECT_EQ((MaskableLogger::Mask)mask, mylogger.getMask());
 	}
 }
 
@@ -275,7 +275,7 @@ TEST_F(LoggerTest, SetMaskEnvironment) {
 	EXPECT_FALSE(mylogger.isEnabled(mylogger.EMERGENCY));
 	EXPECT_FALSE(mylogger.isEnabled(mylogger.PRINT));
 	/**/
-	EXPECT_EQ((Logger::Mask)0, mylogger.getMask());
+	EXPECT_EQ((MaskableLogger::Mask)0, mylogger.getMask());
 	for (int mask = 0; mask <= 0xffff; ++mask) {
 		char string[sizeof("0xffff")];
 		std::snprintf(string, sizeof(string), "0x%x", mask);
