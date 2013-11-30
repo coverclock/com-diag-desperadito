@@ -338,6 +338,16 @@ $(OUT)/$(TST_DIR)/%:	$(TST_DIR)/%.c $(TARGETLIBRARIES)
 $(OUT)/$(TST_DIR)/%:	$(TST_DIR)/%.cpp $(TARGETLIBRARIESXX) $(TARGETLIBRARIES)
 	test -d $(OUT)/$(TST_DIR) || mkdir -p $(OUT)/$(TST_DIR)
 	$(CXX) -rdynamic $(CPPFLAGS) $(CXXFLAGS) -o $@ $< $(LDXXFLAGS)
+	
+########## Google Tests
+
+#GTEST_DIR=$(HOME)/src/gtest-1.6.0#http://googletest.googlecode.com/files/gtest-1.6.0.zip
+#GTEST_LIB=$(GTEST_DIR)/libgtest.a
+#GTEST_INC=$(GTEST_DIR)/include
+
+GTEST_INCS=-I$(GTEST_INC)
+GTEST_LIBS=$(GTEST_LIB)
+
 
 ########## Generated
 
