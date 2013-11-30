@@ -53,11 +53,11 @@ library. Desperadito is an open source library of object-oriented
 software components written in C++. It implements design patterns
 that the author(s) has found to be both useful in embedded applications.
 
-Desperadito is an mashup of code from the Digital Aggregates projects
-Desperado, Hayloft, and Lariat, with the build system from Diminuto. Why?
-Because it's darn useful. Unfortunately, Desperado, Hayloft, and Diminuto
-have very different unit test frameworks, and Lariat is part of a unit test
-framework; I have not made any attempt to reconcile them in Desperadito.
+Desperadito is a mashup of code from the Digital Aggregates projects
+Desperado and Hayloft with the build system from Diminuto. Why? Because
+it's darn useful. Unfortunately, Desperado, Hayloft, and Diminuto each have
+very different unit test frameworks; I have not made any attempt to reconcile
+them in Desperadito.
 
 It is licensed under a modified GNU Lesser General Public License
 to allow it to be incorporated into proprietary software or

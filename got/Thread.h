@@ -40,17 +40,17 @@ struct MyMutex : public Mutex {
 	: nesting(0)
 	{}
 	virtual int begin() {
-		Logger::instance().debug("MyMutex[0x%lx]::begin\n", Thread::self());
+		MaskableLogger::instance().debug("MyMutex[0x%lx]::begin\n", Thread::self());
 		status = Mutex::begin();
-		Logger::instance().debug("MyMutex[0x%lx]::begin %d %s\n", Thread::self(), nesting, ::strerror(status));
+		MaskableLogger::instance().debug("MyMutex[0x%lx]::begin %d %s\n", Thread::self(), nesting, ::strerror(status));
 		++nesting;
 		return status;
 	}
 	virtual int end() {
 		--nesting;
-		Logger::instance().debug("MyMutex[0x%lx]::end %d\n", Thread::self(), nesting);
+		MaskableLogger::instance().debug("MyMutex[0x%lx]::end %d\n", Thread::self(), nesting);
 		status = Mutex::end();
-		Logger::instance().debug("MyMutex[0x%lx]::end %s\n", Thread::self(), ::strerror(status));
+		MaskableLogger::instance().debug("MyMutex[0x%lx]::end %s\n", Thread::self(), ::strerror(status));
 		return status;
 	}
 };
@@ -380,11 +380,11 @@ struct ThreadCondition : public Thread {
 	virtual void * run() {
 		MyCriticalSection guard(conditionmutex);
 		while (variable < 100) {
-			Logger::instance().debug("Thread: before %d\n", variable);
+			MaskableLogger::instance().debug("Thread: before %d\n", variable);
 			while ((variable % 2) == 0) {
 				conditionodd.wait(conditionmutex);
 			}
-			Logger::instance().debug("Thread: after %d\n", variable);
+			MaskableLogger::instance().debug("Thread: after %d\n", variable);
 			++variable;
 			conditioneven.signal();
 		}
@@ -401,11 +401,11 @@ TEST_F(ThreadTest, Condition) {
 	{
 		MyCriticalSection guard(conditionmutex);
 		while (variable < 99) {
-			Logger::instance().debug("Main: before %d\n", variable);
+			MaskableLogger::instance().debug("Main: before %d\n", variable);
 			while ((variable % 2) != 0) {
 				conditioneven.wait(conditionmutex);
 			}
-			Logger::instance().debug("Main: after %d\n", variable);
+			MaskableLogger::instance().debug("Main: after %d\n", variable);
 			++variable;
 			conditionodd.signal();
 		}
@@ -503,7 +503,7 @@ TEST_F(ThreadTest, Monitor) {
 		if (variable == 0) { variable = 2; }
 	}
 	EXPECT_EQ(thread.join(), 0);
-	Logger::instance().configuration("ThreadTest.Monitor: looks like a %s monitor to me.\n", (variable == 1) ? "Mesa" : (variable == 2) ? "Hoare" : "Unknown");
+	MaskableLogger::instance().configuration("ThreadTest.Monitor: looks like a %s monitor to me.\n", (variable == 1) ? "Mesa" : (variable == 2) ? "Hoare" : "Unknown");
 }
 
 static MyMutex parallelmutex;

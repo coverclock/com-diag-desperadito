@@ -3,6 +3,12 @@
 # Chip Overclock
 # mailto:coverclock@diag.com
 # http://www.diag.com/navigation/downloads/Desperadito.html
+#
+# Desperadito is a mashup of code from the Digital Aggregates projects
+# Desperado and Hayloft with the build system from Diminuto. Why? Because
+# it's darn useful. Unfortunately, Desperado, Hayloft, and Diminuto each have
+# very different unit test frameworks; I have not made any attempt to reconcile
+# them in Desperadito.
 
 PROJECT				=	desperadito
 TITLE				=	Desperadito
@@ -261,12 +267,12 @@ $(ETC_DIR)/diminuto.sh:	Makefile
 ########## Target C Libraries
 
 $(OUT)/$(ARC_DIR)/lib$(PROJECT).a:	$(TARGETOBJECTS)
-	test -d $(OUT)/$(ARC_DIR) || mkdir -p $(OUT)/$(ARC_DIR)
+	D=`dirname $@`; test -d $$D || mkdir -p $$D
 	$(AR) $(ARFLAGS) $@ $^
 	$(RANLIB) $@
 
 $(OUT)/$(LIB_DIR)/lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD):	$(OUT)/$(ARC_DIR)/lib$(PROJECT).a
-	test -d $(OUT)/$(LIB_DIR) || mkdir -p $(OUT)/$(LIB_DIR)
+	D=`dirname $@`; test -d $$D || mkdir -p $$D
 	$(CC) $(CARCH) -shared -Wl,-soname,lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD) -o $@ -Wl,--whole-archive $< -Wl,--no-whole-archive
 
 $(OUT)/$(LIB_DIR)/lib$(PROJECT).so:	$(OUT)/$(LIB_DIR)/lib$(PROJECT).so.$(MAJOR).$(MINOR).$(BUILD)
@@ -281,12 +287,12 @@ $(OUT)/$(LIB_DIR)/lib$(PROJECT).so.$(MAJOR).$(MINOR):	$(OUT)/$(LIB_DIR)/lib$(PRO
 ########## Target C++ Libraries
 
 $(OUT)/$(ARC_DIR)/lib$(PROJECT)xx.a:	$(TARGETOBJECTSXX)
-	test -d $(OUT)/$(ARC_DIR) || mkdir -p $(OUT)/$(ARC_DIR)
+	D=`dirname $@`; test -d $$D || mkdir -p $$D
 	$(AR) $(ARFLAGS) $@ $^
 	$(RANLIB) $@
 
 $(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR).$(BUILD):	$(OUT)/$(ARC_DIR)/lib$(PROJECT)xx.a
-	test -d $(OUT)/$(LIB_DIR) || mkdir -p $(OUT)/$(LIB_DIR)
+	D=`dirname $@`; test -d $$D || mkdir -p $$D
 	$(CC) $(CARCH) -shared -Wl,-soname,lib$(PROJECT)xx.so.$(MAJOR).$(MINOR).$(BUILD) -o $@ -Wl,--whole-archive $< -Wl,--no-whole-archive
 
 $(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so:	$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR).$(BUILD)
@@ -301,12 +307,12 @@ $(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR):	$(OUT)/$(LIB_DIR)/lib$(P
 ########## Target Unit Test Libraries
 
 $(OUT)/$(ARC_DIR)/lib$(PROJECT)ut.a:	$(TARGETOBJECTSUT) $(TARGETOBJECTSUTXX)
-	test -d $(OUT)/$(ARC_DIR) || mkdir -p $(OUT)/$(ARC_DIR)
+	D=`dirname $@`; test -d $$D || mkdir -p $$D
 	$(AR) $(ARFLAGS) $@ $^
 	$(RANLIB) $@
 
 $(OUT)/$(LIB_DIR)/lib$(PROJECT)ut.so.$(MAJOR).$(MINOR).$(BUILD):	$(OUT)/$(ARC_DIR)/lib$(PROJECT)ut.a
-	test -d $(OUT)/$(LIB_DIR) || mkdir -p $(OUT)/$(LIB_DIR)
+	D=`dirname $@`; test -d $$D || mkdir -p $$D
 	$(CC) $(CARCH) -shared -Wl,-soname,lib$(PROJECT)ut.so.$(MAJOR).$(MINOR).$(BUILD) -o $@ -Wl,--whole-archive $< -Wl,--no-whole-archive
 
 $(OUT)/$(LIB_DIR)/lib$(PROJECT)ut.so:	$(OUT)/$(LIB_DIR)/lib$(PROJECT)ut.so.$(MAJOR).$(MINOR).$(BUILD)
@@ -321,7 +327,7 @@ $(OUT)/$(LIB_DIR)/lib$(PROJECT)ut.so.$(MAJOR).$(MINOR):	$(OUT)/$(LIB_DIR)/lib$(P
 ########## Target Unstripped Binaries
 
 $(OUT)/$(SYM_DIR)/%:	$(BIN_DIR)/%.c $(TARGETLIBRARIES)
-	test -d $(OUT)/$(SYM_DIR) || mkdir -p $(OUT)/$(SYM_DIR)
+	D=`dirname $@`; test -d $$D || mkdir -p $$D
 	$(CC) $(CPPFLAGS) -I $(KERNEL_DIR)/include $(CFLAGS) -o $@ $< $(LDFLAGS)
 	
 ########## Target Aliases
@@ -332,22 +338,30 @@ $(OUT)/$(BIN_DIR)/hex $(OUT)/$(BIN_DIR)/oct $(OUT)/$(BIN_DIR)/ntohs $(OUT)/$(BIN
 ########## Unit Tests
 
 $(OUT)/$(TST_DIR)/%:	$(TST_DIR)/%.c $(TARGETLIBRARIES)
-	test -d $(OUT)/$(TST_DIR) || mkdir -p $(OUT)/$(TST_DIR)
+	D=`dirname $@`; test -d $$D || mkdir -p $$D	
 	$(CC) -rdynamic $(CPPFLAGS) $(CFLAGS) -o $@ $< $(LDFLAGS)
 	
 $(OUT)/$(TST_DIR)/%:	$(TST_DIR)/%.cpp $(TARGETLIBRARIESXX) $(TARGETLIBRARIES)
-	test -d $(OUT)/$(TST_DIR) || mkdir -p $(OUT)/$(TST_DIR)
+	D=`dirname $@`; test -d $$D || mkdir -p $$D	
 	$(CXX) -rdynamic $(CPPFLAGS) $(CXXFLAGS) -o $@ $< $(LDXXFLAGS)
 	
 ########## Google Tests
 
-#GTEST_DIR=$(HOME)/src/gtest-1.6.0#http://googletest.googlecode.com/files/gtest-1.6.0.zip
-#GTEST_LIB=$(GTEST_DIR)/libgtest.a
-#GTEST_INC=$(GTEST_DIR)/include
+GTEST_DIR=$(HOME)/src/gtest-1.7.0#http://googletest.googlecode.com/files/gtest-1.7.0.zip
+
+GTEST_LIB=$(GTEST_DIR)/libgtest.a
+GTEST_INC=$(GTEST_DIR)/include
 
 GTEST_INCS=-I$(GTEST_INC)
 GTEST_LIBS=$(GTEST_LIB)
 
+.PHONY:	unittest
+
+unittest:	$(OUT_DIR)/host/$(TST_DIR)/unittest
+
+$(OUT_DIR)/host/$(TST_DIR)/unittest:	$(GOT_DIR)/unittest.cpp
+	D=`dirname $@`; test -d $$D || mkdir -p $$D	
+	g++ $(CPPFLAGS) $(CXXFLAGS) $(GTEST_INCS) -I$(GOT_DIR) -o $@ $^ $(GTEST_LIBS) $(LDXXFLAGS)
 
 ########## Generated
 
