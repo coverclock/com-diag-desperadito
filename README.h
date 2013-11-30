@@ -5,19 +5,11 @@
 
 /*******************************************************************************
 
-Copyright 2005-2011 Digital Aggregates Corporation, Colorado, USA.
+Copyright 2005-2013 Digital Aggregates Corporation, Colorado, USA.
 
 ----------------------------------------------------------------------
 
 LICENSES
-
------
-
-The C and C++ portions of this library are licensed under a modified
-version of the GNU Lesser General Public License that allows for
-static linking without any viral licensing implications:
-
---
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -59,22 +51,17 @@ ABSTRACT
 This file is part of the Digital Aggregates Corporation Desperadito
 library. Desperadito is an open source library of object-oriented
 software components written in C++. It implements design patterns
-that the author(s) has found to be both useful and common in embedded
-applications.
+that the author(s) has found to be both useful in embedded applications.
 
-Desperadito was derived from code in the Digital Aggregates projects
-Desperado, Diminuto, and Hayloft.
+Desperadito is an mashup of code from the Digital Aggregates projects
+Desperado, Hayloft, and Lariat, with the build system from Diminuto. Why?
+Because it's darn useful. Unfortunately, Desperado, Hayloft, and Diminuto
+have very different unit test frameworks, and Lariat is part of a unit test
+framework; I have not made any attempt to reconcile them in Desperadito.
 
 It is licensed under a modified GNU Lesser General Public License
 to allow it to be incorporated into proprietary software or
 firmware without restriction or viral licensing implication.
-
-Desperado requires
-
-o   ANSI C++ and ANSI C99-compilant compilers,
-o   a POSIX-compliant operating system and run-time library, including
-o   POSIX threads, and
-o   support for 64-bit integral types.
 
 Contact:
 
