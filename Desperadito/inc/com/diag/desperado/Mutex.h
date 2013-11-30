@@ -79,6 +79,8 @@
  */
 class Mutex : public Object {
 
+	friend class Condition;
+
 public:
 
     /**
