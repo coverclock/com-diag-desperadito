@@ -6,15 +6,15 @@
 
 PROJECT				=	desperadito
 TITLE				=	Desperadito
-SYMBOL				=	DESPERADO
+SYMBOL				=	DESPERADITO
 
 ########## Customizations
 
 TARGET				=	host
 #TARGET				=	cobbler
 
-MAJOR				=	7# API changes requiring that applications be modified.
-MINOR				=	1# Only functionality or features added with no legacy API changes.
+MAJOR				=	8# API changes requiring that applications be modified.
+MINOR				=	0# Only functionality or features added with no legacy API changes.
 BUILD				=	0# Only bugs fixed with no API changes or new functionality.
 
 # Some certification, defense, or intelligence agencies (e.g. the U.S. Federal
@@ -89,18 +89,17 @@ endif
 ARC_DIR				=	arc# Archive files
 BIN_DIR				=	bin# Stripped executable binaries
 DOC_DIR				=	doc# Documentation
-DRV_DIR				=	drv# Loadable kernel modules
 ETC_DIR				=	etc# Miscellaneous files
 GEN_DIR				=	gen# Generated files
 INC_DIR				=	inc# Header files
 LIB_DIR				=	lib# Shared objects
-MOD_DIR				=	mod# Loadable user modules
 OUT_DIR				=	out# Build artifacts
 SRC_DIR				=	src# Library source files
 SYM_DIR				=	sym# Unstripped executable binaries
 SYS_DIR				=	sys# Kernel module build directory
 TMP_DIR				=	tmp# Temporary files
 TST_DIR				=	tst# Unit tests
+UTF_DIR				=	utf# Unit test functions
 
 ########## Variables
 
@@ -129,8 +128,6 @@ ALIASES				=
 
 TARGETOBJECTS		=	$(addprefix $(OUT)/,$(addsuffix .o,$(basename $(wildcard $(SRC_DIR)/*.c))))
 TARGETOBJECTSXX		=	$(addprefix $(OUT)/,$(addsuffix .o,$(basename $(wildcard $(SRC_DIR)/*.cpp))))
-TARGETDRIVERS		=	$(addprefix $(OUT)/,$(addsuffix .ko,$(basename $(wildcard $(DRV_DIR)/*.c))))
-TARGETMODULES		=	$(addprefix $(OUT)/,$(addsuffix .so,$(basename $(wildcard $(MOD_DIR)/*.c))))
 TARGETSCRIPTS		=	$(addprefix $(OUT)/,$(basename $(wildcard $(BIN_DIR)/*.sh)))
 TARGETBINARIES		=	$(addprefix $(OUT)/,$(basename $(wildcard $(BIN_DIR)/*.c)))
 TARGETGENERATED		=	$(addprefix $(OUT)/$(BIN_DIR)/,$(GENERATED))
@@ -138,9 +135,12 @@ TARGETALIASES		=	$(addprefix $(OUT)/$(BIN_DIR)/,$(ALIASES))
 TARGETUNITTESTS		=	$(addprefix $(OUT)/,$(basename $(wildcard $(TST_DIR)/*.c)))
 TARGETUNITTESTS		+=	$(addprefix $(OUT)/,$(basename $(wildcard $(TST_DIR)/*.cpp)))
 TARGETUNITTESTS		+=	$(addprefix $(OUT)/,$(basename $(wildcard $(TST_DIR)/*.sh)))
+TARGETUTFUNCTIONS	=	$(addprefix $(OUT)/,$(basename $(wildcard $(UTF_DIR)/*.c)))
+TARGETUTFUNCTIONS	+=	$(addprefix $(OUT)/,$(basename $(wildcard $(UTF_DIR)/*.cpp)))
 
 TARGETARCHIVE		=	$(OUT)/$(ARC_DIR)/$(PROJECT_A)
 TARGETARCHIVEXX		=	$(OUT)/$(ARC_DIR)/$(PROJECTXX_A)
+TARGETARCHIVEUT		=	$(OUT)/$(ARC_DIR)/$(PROJECTUT_A)
 TARGETSHARED		=	$(OUT)/$(LIB_DIR)/$(PROJECT_SO).$(MAJOR).$(MINOR).$(BUILD)
 TARGETSHARED		+=	$(OUT)/$(LIB_DIR)/$(PROJECT_SO).$(MAJOR).$(MINOR)
 TARGETSHARED		+=	$(OUT)/$(LIB_DIR)/$(PROJECT_SO).$(MAJOR)
@@ -149,9 +149,13 @@ TARGETSHAREDXX		=	$(OUT)/$(LIB_DIR)/$(PROJECTXX_SO).$(MAJOR).$(MINOR).$(BUILD)
 TARGETSHAREDXX		+=	$(OUT)/$(LIB_DIR)/$(PROJECTXX_SO).$(MAJOR).$(MINOR)
 TARGETSHAREDXX		+=	$(OUT)/$(LIB_DIR)/$(PROJECTXX_SO).$(MAJOR)
 TARGETSHAREDXX		+=	$(OUT)/$(LIB_DIR)/$(PROJECTXX_SO)
+TARGETSHAREDUT		=	$(OUT)/$(LIB_DIR)/$(PROJECTUT_A).$(MAJOR).$(MINOR).$(BUILD)
+TARGETSHAREDUT		+=	$(OUT)/$(LIB_DIR)/$(PROJECTUT_A).$(MAJOR).$(MINOR)
+TARGETSHAREDUT		+=	$(OUT)/$(LIB_DIR)/$(PROJECTUT_A).$(MAJOR)
+TARGETSHAREDUT		+=	$(OUT)/$(LIB_DIR)/$(PROJECTUT_A)
 
 TARGETLIBRARIES		=	$(TARGETARCHIVE) $(TARGETSHARED)
-TARGETLIBRARIESXX	=	$(TARGETARCHIVEXX) $(TARGETSHAREDXX)
+TARGETLIBRARIESXX	=	$(TARGETARCHIVEXX) $(TARGETSHAREDXX) $(TARGETSHAREDUT)
 TARGETPROGRAMS		=	$(TARGETBINARIES) $(TARGETALIASES) $(TARGETUNITTESTS) $(TARGETGENERATED) $(TARGETSCRIPTS)
 TARGETDEFAULT		=	$(TARGETLIBRARIES) $(TARGETLIBRARIESXX) $(TARGETMODULES) $(TARGETPROGRAMS)
 TARGETPACKAGE		=	$(TARGETDEFAULT) $(TARGETDRIVERS)
@@ -288,6 +292,26 @@ $(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR):	$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx
 
 $(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR):	$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR).$(BUILD)
 	D=`dirname $<`; F=`basename $<`; T=`basename $@`; ( cd $$D; ln -s -f $$F $$T ) 
+	
+########## Target Unit Test Libraries
+
+$(OUT)/$(ARC_DIR)/lib$(PROJECT)xx.a:	$(TARGETOBJECTSUT)
+	test -d $(OUT)/$(ARC_DIR) || mkdir -p $(OUT)/$(ARC_DIR)
+	$(AR) $(ARFLAGS) $@ $^
+	$(RANLIB) $@
+
+$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR).$(BUILD):	$(OUT)/$(ARC_DIR)/lib$(PROJECT)xx.a
+	test -d $(OUT)/$(LIB_DIR) || mkdir -p $(OUT)/$(LIB_DIR)
+	$(CC) $(CARCH) -shared -Wl,-soname,lib$(PROJECT)xx.so.$(MAJOR).$(MINOR).$(BUILD) -o $@ -Wl,--whole-archive $< -Wl,--no-whole-archive
+
+$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so:	$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR).$(BUILD)
+	D=`dirname $<`; F=`basename $<`; T=`basename $@`; ( cd $$D; ln -s -f $$F $$T ) 
+
+$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR):	$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR).$(BUILD)
+	D=`dirname $<`; F=`basename $<`; T=`basename $@`; ( cd $$D; ln -s -f $$F $$T ) 
+
+$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR):	$(OUT)/$(LIB_DIR)/lib$(PROJECT)xx.so.$(MAJOR).$(MINOR).$(BUILD)
+	D=`dirname $<`; F=`basename $<`; T=`basename $@`; ( cd $$D; ln -s -f $$F $$T ) 
 
 ########## Target Unstripped Binaries
 
@@ -375,42 +399,6 @@ $(OUT)/$(BIN_DIR)/setup:	Makefile
 	echo 'export LD_DRIVER_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../drv' >> $@
 	echo 'export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$COM_DIAG_$(SYMBOL)_ROOT/../lib' >> $@
 	echo 'export LD_MODULE_PATH=$$COM_DIAG_$(SYMBOL)_ROOT/../mod' >> $@
-
-########## User-Space Loadable Modules
-
-LDWHOLEARCHIVES=# These archives will be linked into the shared object in their entirety.
-
-$(OUT)/$(MOD_DIR)/%.so:	$(MOD_DIR)/%.c
-	test -d $(OUT)/$(MOD_DIR) || mkdir -p $(OUT)/$(MOD_DIR)
-	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ -shared $< $(LDFLAGS) -Wl,--whole-archive $(LDWHOLEARCHIVES) -Wl,--no-whole-archive
-
-########## Kernel-Space Loadable Modules
-
-.PHONY:	drivers drivers-clean
-
-OBJ_M =	$(addsuffix .o,$(basename $(shell cd $(DRV_DIR); ls *.c)))
-
-$(OUT)/$(SYS_DIR)/Makefile:	Makefile
-	D=`dirname $@`; test -d $$D || mkdir -p $$D	
-	echo "# GENERATED FILE! DO NOT EDIT!" > $@
-	echo "obj-m := $(OBJ_M)" >> $@
-	echo "EXTRA_CFLAGS := -iquote $(HERE)/$(INC_DIR) -iquote $(HERE)/$(TST_DIR)" >> $@
-	#echo "EXTRA_CFLAGS := -iquote $(HERE)/$(INC_DIR) -iquote $(HERE)/$(TST_DIR) -DDEBUG" >> $@
-
-$(OUT)/$(SYS_DIR)/%.c:	$(DRV_DIR)/%.c
-	D=`dirname $@`; test -d $$D || mkdir -p $$D	
-	cp $< $@
-
-$(OUT)/$(DRV_DIR)/%.ko:	$(OUT)/$(SYS_DIR)/%.ko
-	D=`dirname $@`; test -d $$D || mkdir -p $$D	
-	cp $< $@
-
-drivers $(OUT)/$(SYS_DIR)/diminuto_mmdriver.ko $(OUT)/$(SYS_DIR)/diminuto_utmodule.ko $(OUT)/$(SYS_DIR)/diminuto_kernel_datum.ko $(OUT)/$(SYS_DIR)/diminuto_kernel_map.ko:	$(OUT)/$(SYS_DIR)/Makefile $(OUT)/$(SYS_DIR)/diminuto_mmdriver.c $(OUT)/$(SYS_DIR)/diminuto_utmodule.c $(OUT)/$(SYS_DIR)/diminuto_kernel_datum.c $(OUT)/$(SYS_DIR)/diminuto_kernel_map.c
-	make -C $(KERNEL_DIR) M=$(shell cd $(OUT)/$(SYS_DIR); pwd) CROSS_COMPILE=$(CROSS_COMPILE) ARCH=$(ARCH) modules
-
-drivers-clean:
-	make -C $(KERNEL_DIR) M=$(shell cd $(OUT)/$(SYS_DIR); pwd) CROSS_COMPILE=$(CROSS_COMPILE) ARCH=$(ARCH) clean
-	rm -f $(OUT)/$(SYS_DIR)/Makefile
 
 ########## Helpers
 
