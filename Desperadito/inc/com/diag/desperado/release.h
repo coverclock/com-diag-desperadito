@@ -3,7 +3,7 @@
 #define DESPERADO_VINTAGE_VERSION "7.0.0"
 #define DESPERADO_VINTAGE_COPYRIGHT "Copyright 2005-2011 Digital Aggregates Corporation, Colorado, USA."
 #define DESPERADO_VINTAGE_CONTACT "coverclock@diag.com (Chip Overclock)"
-#define DESPERADO_VINTAGE_URL "http://www.diag.com/navigation/downloads/Desperado.html"
+#define DESPERADO_VINTAGE_URL "http://www.diag.com/navigation/downloads/Desperadito.html"
 #define DESPERADO_VINTAGE_DATE "20111223T144844.477531708-07:00"
 #define DESPERADO_VINTAGE_PLATFORM "Linux"
 #define DESPERADO_VINTAGE_TARGET "IA32"
