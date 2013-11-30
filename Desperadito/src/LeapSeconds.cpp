@@ -96,7 +96,8 @@ static const CommonEra COMMONERAS[] = {
     CommonEra(1997,  6, 30, 23, 59, 60),
     CommonEra(1998, 12, 31, 23, 59, 60),
     CommonEra(2005, 12, 31, 23, 59, 60),
-    CommonEra(2008, 12, 31, 23, 59, 60)
+    CommonEra(2008, 12, 31, 23, 59, 60),
+    CommonEra(2012,  6, 30, 23, 59, 60),
     //
     //  When another leap second occurs, insert
     //  its Common Era date and time here. It will
