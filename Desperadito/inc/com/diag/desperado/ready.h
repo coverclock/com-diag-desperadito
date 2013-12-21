@@ -4,7 +4,7 @@
 
 /******************************************************************************
 
-    Copyright 2011 Digital Aggregates Corporation, Colorado, USA.
+    Copyright 2011-2013 Digital Aggregates Corporation, Colorado, USA.
     This file is part of the Digital Aggregates Desperadito library.
     
     This library is free software; you can redistribute it and/or
@@ -54,6 +54,13 @@
 #include "com/diag/desperado/target.h"
 #include "com/diag/desperado/generics.h"
 
+#include <sys/types.h>
+#if defined(__UCLIBC_MAJOR__) && defined(__UCLIBC_MINOR__) && defined(__UCLIBC_SUBLEVEL__)
+#	define DESPERADO_HAS_UCLIBC 1
+#else
+#	undef DESPERADO_HAS_UCLIBC
+#endif
+
 
 #define DESPERADO_DESCRIPTOR_READY_READ			(1<<0)
 #define DESPERADO_DESCRIPTOR_READY_WRITE		(1<<1)
@@ -79,7 +86,11 @@ CXXCAPI int desperado_descriptor_ready(int fd);
  * @return the number of readable bytes.
  */
 CXXCINLINE size_t desperado_file_readable(FILE * fp) {
+#if defined(DESPERADO_HAS_UCLIBC)
+	return (fp != 0) ? ((fp->__bufpos < fp->__bufgetc_u) ? fp->__bufgetc_u - fp->__bufpos : 0) : 0;
+#else
 	return (fp != 0) ? ((fp->_IO_read_ptr < fp->_IO_read_end) ? fp->_IO_read_end - fp->_IO_read_ptr : 0) : 0;
+#endif
 }
 
 /**
@@ -91,7 +102,11 @@ CXXCINLINE size_t desperado_file_readable(FILE * fp) {
  * @return the number of writeable bytes.
  */
 CXXCINLINE size_t desperado_file_writeable(FILE * fp) {
+#if defined(DESPERADO_HAS_UCLIBC)
+	return (fp != 0) ? ((fp->__bufpos < fp->__bufputc_u) ? fp->__bufputc_u - fp->__bufpos : 0) : 0;
+#else
 	return (fp != 0) ? ((fp->_IO_write_ptr < fp->_IO_write_end) ? fp->_IO_write_end - fp->_IO_write_ptr : 0) : 0;
+#endif
 }
 
 
