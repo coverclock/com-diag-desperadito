@@ -1,6 +1,6 @@
 /* vim: set ts=4 expandtab shiftwidth=4: */
-#ifndef _H_COM_DIAG_HAYLOFT_MASKABLELOGGER_
-#define _H_COM_DIAG_HAYLOFT_MASKABLELOGGER_
+#ifndef _H_COM_DIAG_DESPERADO_MASKABLELOGGER_
+#define _H_COM_DIAG_DESPERADO_MASKABLELOGGER_
 
 /**
  * @file
