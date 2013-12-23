@@ -21,7 +21,7 @@ TARGET				=	host
 
 MAJOR				=	8# API changes requiring that applications be modified.
 MINOR				=	1# Only functionality or features added with no legacy API changes.
-BUILD				=	0# Only bugs fixed with no API changes or new functionality.
+BUILD				=	1# Only bugs fixed with no API changes or new functionality.
 
 # Some certification, defense, or intelligence agencies (e.g. the U.S. Federal
 # Aviation Administration or FAA) require that software builds for safety
@@ -156,6 +156,7 @@ TARGETOBJECTSUT		=	$(addprefix $(OUT)/,$(addsuffix .o,$(basename $(wildcard $(UT
 TARGETOBJECTSUTXX	+=	$(addprefix $(OUT)/,$(addsuffix .o,$(basename $(wildcard $(UTF_DIR)/*.cpp))))
 TARGETSCRIPTS		=	$(addprefix $(OUT)/,$(basename $(wildcard $(BIN_DIR)/*.sh)))
 TARGETBINARIES		=	$(addprefix $(OUT)/,$(basename $(wildcard $(BIN_DIR)/*.c)))
+TARGETBINARIES		+=	$(addprefix $(OUT)/,$(basename $(wildcard $(BIN_DIR)/*.cpp)))
 TARGETGENERATED		=	$(addprefix $(OUT)/$(BIN_DIR)/,$(GENERATED))
 TARGETALIASES		=	$(addprefix $(OUT)/$(BIN_DIR)/,$(ALIASES))
 TARGETUNITTESTS		=	$(addprefix $(OUT)/,$(basename $(wildcard $(TST_DIR)/*.c)))
@@ -221,6 +222,9 @@ LDXXFLAGS			=	$(LDARCH) -l$(PROJECT)ut -l$(PROJECT)xx -l$(PROJECT) -lpthread -lr
 BROWSER				=	firefox
 
 ########## Main Entry Points
+
+foo:
+	echo $(TARGETPACKAGE)
 
 .PHONY:	default all dist clean pristine
 
@@ -344,7 +348,11 @@ $(OUT)/$(LIB_DIR)/lib$(PROJECT)ut.so.$(MAJOR).$(MINOR):	$(OUT)/$(LIB_DIR)/lib$(P
 $(OUT)/$(SYM_DIR)/%:	$(BIN_DIR)/%.c $(TARGETLIBRARIES)
 	D=`dirname $@`; test -d $$D || mkdir -p $$D
 	$(CC) $(CPPFLAGS) -I $(KERNEL_DIR)/include $(CFLAGS) -o $@ $< $(LDFLAGS)
-	
+
+$(OUT)/$(SYM_DIR)/%:	$(BIN_DIR)/%.cpp $(TARGETLIBRARIESXX) $(TARGETLIBRARIES)
+	D=`dirname $@`; test -d $$D || mkdir -p $$D
+	$(CXX) $(CPPFLAGS) -I $(KERNEL_DIR)/include $(CXXFLAGS) -o $@ $< $(LDXXFLAGS)
+
 ########## Target Aliases
 
 $(OUT)/$(BIN_DIR)/hex $(OUT)/$(BIN_DIR)/oct $(OUT)/$(BIN_DIR)/ntohs $(OUT)/$(BIN_DIR)/htons $(OUT)/$(BIN_DIR)/ntohl $(OUT)/$(BIN_DIR)/htonl:	$(OUT)/$(BIN_DIR)/dec
