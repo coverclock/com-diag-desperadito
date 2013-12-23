@@ -80,10 +80,13 @@ CXXCAPI int desperado_descriptor_ready(int fd);
  * @return the number of readable bytes.
  */
 CXXCINLINE size_t desperado_file_readable(FILE * fp) {
-#if defined(DESPERADO_HAS_UCLIBC)
+#if !defined(DESPERADO_HAS_UCLIBC)
+	return (fp != 0) ? ((fp->_IO_read_ptr < fp->_IO_read_end) ? fp->_IO_read_end - fp->_IO_read_ptr : 0) : 0;
+#elif defined(__STDIO_BUFFERS) && defined(__STDIO_GETC_MACRO)
 	return (fp != 0) ? ((fp->__bufpos < fp->__bufgetc_u) ? fp->__bufgetc_u - fp->__bufpos : 0) : 0;
 #else
-	return (fp != 0) ? ((fp->_IO_read_ptr < fp->_IO_read_end) ? fp->_IO_read_end - fp->_IO_read_ptr : 0) : 0;
+#	warning desperado_file_readable stubbed!
+	return 1;
 #endif
 }
 
@@ -96,10 +99,13 @@ CXXCINLINE size_t desperado_file_readable(FILE * fp) {
  * @return the number of writeable bytes.
  */
 CXXCINLINE size_t desperado_file_writeable(FILE * fp) {
-#if defined(DESPERADO_HAS_UCLIBC)
+#if !defined(DESPERADO_HAS_UCLIBC)
+	return (fp != 0) ? ((fp->_IO_write_ptr < fp->_IO_write_end) ? fp->_IO_write_end - fp->_IO_write_ptr : 0) : 0;
+#elif defined(__STDIO_BUFFERS) && defined(__STDIO_PUTC_MACRO)
 	return (fp != 0) ? ((fp->__bufpos < fp->__bufputc_u) ? fp->__bufputc_u - fp->__bufpos : 0) : 0;
 #else
-	return (fp != 0) ? ((fp->_IO_write_ptr < fp->_IO_write_end) ? fp->_IO_write_end - fp->_IO_write_ptr : 0) : 0;
+#	warning desperado_file_writeable stubbed!
+	return 1;
 #endif
 }
 
