@@ -20,8 +20,8 @@ TARGET				=	host
 #TARGET				=	cobbler
 
 MAJOR				=	8# API changes requiring that applications be modified.
-MINOR				=	0# Only functionality or features added with no legacy API changes.
-BUILD				=	1# Only bugs fixed with no API changes or new functionality.
+MINOR				=	1# Only functionality or features added with no legacy API changes.
+BUILD				=	0# Only bugs fixed with no API changes or new functionality.
 
 # Some certification, defense, or intelligence agencies (e.g. the U.S. Federal
 # Aviation Administration or FAA) require that software builds for safety
@@ -59,37 +59,6 @@ VINFO				=	svn info
 # sources, toolchains, etc.
 HOME_DIR			=	$(HOME)/projects
 
-########## Configurations
-
-ifeq ($(TARGET),cobbler)# Build for the Raspberry Pi version B with the Raspbian system.
-ARCH				=	arm
-PLATFORM			=	linux
-PLATFORM_CLASS		=	Linux
-CPPARCH				=
-CARCH				=	
-#LDARCH				=	-static
-LDARCH				=	-Bdynamic
-TOOLCHAIN			=	$(ARCH)-$(PLATFORM)-gnueabihf
-CROSS_COMPILE		=	$(TOOLCHAIN)-
-KERNEL_REV			=	rpi-3.6.y
-KERNEL_DIR			=	$(HOME_DIR)/cobbler/linux-$(KERNEL_REV)
-INCLUDE_DIR			=	$(HOME_DIR)/cobbler/include-$(KERNEL_REV)/include
-endif
-
-ifeq ($(TARGET),host)# Build for an Intel build server with the Ubuntu kernel.
-ARCH				=	i386
-PLATFORM			=	linux
-PLATFORM_CLASS		=	Linux
-CPPARCH				=
-CARCH				=
-LDARCH				=
-TOOLCHAIN			=
-CROSS_COMPILE		=
-KERNEL_REV			=	3.2.0-51
-KERNEL_DIR			=	/usr/src/linux-headers-$(KERNEL_REV)-generic-pae
-INCLUDE_DIR			=	/usr/include
-endif
-
 ########## Directory Tree
 
 ARC_DIR				=	arc# Archive files
@@ -107,6 +76,52 @@ SYS_DIR				=	sys# Kernel module build directory
 TMP_DIR				=	tmp# Temporary files
 TST_DIR				=	tst# Unit tests
 UTF_DIR				=	utf# Unit test functions
+
+########## Configurations
+
+ifeq ($(TARGET),cobbler)# Build for the Raspberry Pi version B with the Raspbian system.
+ARCH				=	arm
+PLATFORM			=	linux
+PLATFORM_CLASS		=	Linux
+CPPARCH				=
+CARCH				=	
+#LDARCH				=	-static -L$(OUT)/$(ARC_DIR)
+LDARCH				=	-Bdynamic -L$(OUT)/$(LIB_DIR)
+TOOLCHAIN			=	$(ARCH)-$(PLATFORM)-gnueabihf
+CROSS_COMPILE		=	$(TOOLCHAIN)-
+KERNEL_REV			=	rpi-3.6.y
+KERNEL_DIR			=	$(HOME_DIR)/cobbler/linux-$(KERNEL_REV)
+INCLUDE_DIR			=	$(HOME_DIR)/cobbler/include-$(KERNEL_REV)/include
+endif
+
+ifeq ($(TARGET),uclibc)# Build for uClibc built for the Raspberry Pi.
+ARCH				=	arm
+PLATFORM			=	linux
+PLATFORM_CLASS		=	Linux
+CPPARCH				=
+CARCH				=	
+LDARCH				=	-static -L$(OUT)/$(ARC_DIR)
+#LDARCH				=	-Bdynamic
+TOOLCHAIN			=	$(ARCH)-buildroot-$(PLATFORM)-uclibcgnueabihf
+CROSS_COMPILE		=	$(TOOLCHAIN)-
+KERNEL_REV			=	rpi-3.6.y
+KERNEL_DIR			=	$(HOME_DIR)/cobbler/linux-$(KERNEL_REV)
+INCLUDE_DIR			=	$(HOME_DIR)/cobbler/include-$(KERNEL_REV)/include
+endif
+
+ifeq ($(TARGET),host)# Build for an Intel build server with the Ubuntu kernel.
+ARCH				=	i386
+PLATFORM			=	linux
+PLATFORM_CLASS		=	Linux
+CPPARCH				=
+CARCH				=
+LDARCH				=	-L$(OUT)/$(LIB_DIR)
+TOOLCHAIN			=
+CROSS_COMPILE		=
+KERNEL_REV			=	3.2.0-51
+KERNEL_DIR			=	/usr/src/linux-headers-$(KERNEL_REV)-generic-pae
+INCLUDE_DIR			=	/usr/include
+endif
 
 ########## Variables
 
@@ -200,8 +215,8 @@ CFLAGS				=	$(CARCH) -fPIC -g
 #CFLAGS				=	$(CARCH) -fPIC -O3
 CPFLAGS				=	-i
 MVFLAGS				=	-i
-LDFLAGS				=	$(LDARCH) -L$(OUT)/lib -l$(PROJECT)ut -l$(PROJECT) -lpthread -lrt -ldl
-LDXXFLAGS			=	$(LDARCH) -L$(OUT)/lib -l$(PROJECT)ut -l$(PROJECT)xx -l$(PROJECT) -lpthread -lrt -ldl
+LDFLAGS				=	$(LDARCH) -l$(PROJECT)ut -l$(PROJECT) -lpthread -lrt -ldl
+LDXXFLAGS			=	$(LDARCH) -l$(PROJECT)ut -l$(PROJECT)xx -l$(PROJECT) -lpthread -lrt -ldl
 
 BROWSER				=	firefox
 
