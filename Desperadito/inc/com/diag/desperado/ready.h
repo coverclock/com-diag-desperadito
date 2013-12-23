@@ -53,13 +53,7 @@
 #include "com/diag/desperado/cxxcapi.h"
 #include "com/diag/desperado/target.h"
 #include "com/diag/desperado/generics.h"
-
-#include <sys/types.h>
-#if defined(__UCLIBC_MAJOR__) && defined(__UCLIBC_MINOR__) && defined(__UCLIBC_SUBLEVEL__)
-#	define DESPERADO_HAS_UCLIBC 1
-#else
-#	undef DESPERADO_HAS_UCLIBC
-#endif
+#include "com/diag/desperado/uClibc.h"
 
 
 #define DESPERADO_DESCRIPTOR_READY_READ			(1<<0)
