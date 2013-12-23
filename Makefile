@@ -223,9 +223,6 @@ BROWSER				=	firefox
 
 ########## Main Entry Points
 
-foo:
-	echo $(TARGETPACKAGE)
-
 .PHONY:	default all dist clean pristine
 
 default:	$(TARGETDEFAULT)
