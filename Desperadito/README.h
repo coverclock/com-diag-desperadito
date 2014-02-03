@@ -68,11 +68,11 @@ viral licensing implication.
 Contact:
 
     Chip Overclock
-    mailto:coverclock@diag.com
     Digital Aggregates Corporation
     3440 Youngfield Street, Suite 209
     Wheat Ridge CO 80033 USA
-    +1 303 940 9064
+    http://www.diag.com
+    mailto:coverclock@diag.com
 
 *******************************************************************************/
 
