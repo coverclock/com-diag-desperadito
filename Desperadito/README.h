@@ -48,20 +48,22 @@ License along with this library; if not, contact
 
 ABSTRACT
 
-This file is part of the Digital Aggregates Corporation Desperadito
-library. Desperadito is an open source library of object-oriented
-software components written in C++. It implements design patterns
-that the author has found to be both useful in embedded applications.
+This file is part of the Digital Aggregates Corporation Desperadito package.
+Desperadito is an open source library of object-oriented software components
+written in C++. It implements design patterns that the author has found to be
+both useful in embedded applications, both Linux-based and otherwise. Code from
+Desperadito (and it's pre-fork predecessor Desperado) has legitimately found its
+way into the commercial products of several of the Corporation's clients. So
+don't be surprised if you see this code popping up elsewhere in your travels.
 
-Desperadito is a mashup of code from the Digital Aggregates projects
-Desperado and Hayloft with the build system from Diminuto. Why? Because
-it's darn useful. Unfortunately, Desperado, Hayloft, and Diminuto each have
-very different unit test frameworks; I have not made any attempt to reconcile
-them in Desperadito.
+Desperadito is a mashup of code from the Digital Aggregates projects Desperado
+and Hayloft with the build framework from Diminuto. Desperado, Hayloft, and
+Diminuto each have very different unit test frameworks; I have not made any
+attempt to reconcile or rationalize them in Desperadito.
 
-It is licensed under a modified GNU Lesser General Public License
-to allow it to be incorporated into proprietary software or
-firmware without restriction or viral licensing implication.
+It is licensed under a modified GNU Lesser General Public License to allow it
+to be incorporated into proprietary software or firmware without restriction or
+viral licensing implication.
 
 Contact:
 
