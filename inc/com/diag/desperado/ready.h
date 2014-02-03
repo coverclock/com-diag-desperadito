@@ -86,7 +86,7 @@ CXXCINLINE size_t desperado_file_readable(FILE * fp) {
 	return (fp != 0) ? ((fp->__bufpos < fp->__bufgetc_u) ? fp->__bufgetc_u - fp->__bufpos : 0) : 0;
 #else
 #	warning desperado_file_readable stubbed!
-	return 1;
+	return -1;
 #endif
 }
 
@@ -105,7 +105,7 @@ CXXCINLINE size_t desperado_file_writeable(FILE * fp) {
 	return (fp != 0) ? ((fp->__bufpos < fp->__bufputc_u) ? fp->__bufputc_u - fp->__bufpos : 0) : 0;
 #else
 #	warning desperado_file_writeable stubbed!
-	return 1;
+	return -1;
 #endif
 }
 
