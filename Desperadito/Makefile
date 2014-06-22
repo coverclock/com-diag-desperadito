@@ -134,7 +134,8 @@ ROOT_DIR			=	$(HOME_DIR)/$(PROJECT)
 
 TIMESTAMP			=	$(shell date -u +%Y%m%d%H%M%S%N%Z)
 DATESTAMP			=	$(shell date +%Y%m%d)
-SVNURL				=	svn://graphite/$(PROJECT)/trunk/$(TITLE)
+SVNREPO				=	svn://graphite/$(PROJECT)
+SVNURL				=	$(SVNREPO)/trunk/$(TITLE)
 GITURL				=	https://github.com/coverclock/com-diag-$(PROJECT).git
 
 PROJECT_A			=	lib$(PROJECT).a
@@ -251,7 +252,7 @@ distribution:
 	( cd $(TEMP_DIR); tar cvzf - $(PROJECT)-$(MAJOR).$(MINOR).$(BUILD) ) > $(TEMP_DIR)/$(PROJECT)-$(MAJOR).$(MINOR).$(BUILD).tgz
 	( cd $(TEMP_DIR)/$(PROJECT)-$(MAJOR).$(MINOR).$(BUILD); make TARGET=host; ./out/host/bin/vintage )
 
-.PHONY: commit dcommit push origin
+.PHONY: commit dcommit push init
 
 commit:
 	git commit .
@@ -262,7 +263,9 @@ dcommit:
 push:
 	git push origin master
 
-origin:
+init:
+	git svn clone -s $(SVNREPO)
+	git svn show-ignore > .gitignore
 	git remote add origin $(GITURL)
 
 ########## Host Utilities
