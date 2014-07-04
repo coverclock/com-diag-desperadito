@@ -1,13 +1,7 @@
-#ifndef _COM_DIAG_DESPERADO_README_H_
-#define _COM_DIAG_DESPERADO_README_H_
+com-diag-desperadito
+====================
 
-/* vim: set ts=4 expandtab shiftwidth=4: */
-
-/*******************************************************************************
-
-Copyright 2005-2013 Digital Aggregates Corporation, Colorado, USA.
-
-----------------------------------------------------------------------
+Copyright 2005-2014 Digital Aggregates Corporation, Colorado, USA.
 
 LICENSES
 
@@ -44,8 +38,6 @@ License along with this library; if not, contact
     Boston MA 02111-1307 USA
     http://www.gnu.org/copyleft/lesser.txt
 
-----------------------------------------------------------------------
-
 ABSTRACT
 
 This file is part of the Digital Aggregates Corporation Desperadito package.
@@ -73,15 +65,3 @@ Contact:
     Wheat Ridge CO 80033 USA
     http://www.diag.com
     mailto:coverclock@diag.com
-
-*******************************************************************************/
-
-/**
- *  @file
- *
- *  This is the README for this project.
- *
- *  @author Chip Overclock (coverclock@diag.com)
- */
-
-#endif
