@@ -22,7 +22,7 @@ TARGET				=	host
 
 MAJOR				=	8# API changes requiring that applications be modified.
 MINOR				=	2# Only functionality or features added with no legacy API changes.
-BUILD				=	0# Only bugs fixed with no API changes or new functionality.
+BUILD				=	1# Only bugs fixed with no API changes or new functionality.
 
 # Some certification, defense, or intelligence agencies (e.g. the U.S. Federal
 # Aviation Administration or FAA) require that software builds for safety
@@ -39,7 +39,7 @@ BUILD				=	0# Only bugs fixed with no API changes or new functionality.
 VINTAGE				:=	$(shell date -u +%Y-%m-%dT%H:%M:%S.%N%z)
 
 # This stuff all gets embedded in the vintage application.
-COPYRIGHT			=	2005-2014 Digital Aggregates Corporation, Colorado, USA.
+COPYRIGHT			=	2005-2015 Digital Aggregates Corporation, Colorado, USA.
 LICENSE				=	GNU Lesser General Public License 2.1
 CONTACT				=	coverclock@diag.com
 HOMEPAGE			=	http://www.diag.com/navigation/downloads/$(TITLE).html

@@ -2,7 +2,7 @@
 
 /******************************************************************************
 
-    Copyright 2005-2011 Digital Aggregates Corporation, Colorado, USA.
+    Copyright 2005-2015 Digital Aggregates Corporation, Colorado, USA.
     This file is part of the Digital Aggregates Desperadito library.
     
     This library is free software; you can redistribute it and/or
@@ -98,6 +98,7 @@ static const CommonEra COMMONERAS[] = {
     CommonEra(2005, 12, 31, 23, 59, 60),
     CommonEra(2008, 12, 31, 23, 59, 60),
     CommonEra(2012,  6, 30, 23, 59, 60),
+    CommonEra(2015,  6, 30, 23, 59, 60),
     //
     //  When another leap second occurs, insert
     //  its Common Era date and time here. It will
@@ -140,7 +141,8 @@ static const int LEAPSECONDS[] = {
     20,
     21,
     22,
-    23
+    23,
+    24,
     //
     //  When another leap second occurs, insert the cumulative
     //  number of leap seconds here. If a leap second was inserted,
@@ -180,7 +182,8 @@ static const seconds_t UTCSECONDS[] = {
     COMMONERAS[20].toAtomicSeconds() + LEAPSECONDS[20],
     COMMONERAS[21].toAtomicSeconds() + LEAPSECONDS[21],
     COMMONERAS[22].toAtomicSeconds() + LEAPSECONDS[22],
-    COMMONERAS[23].toAtomicSeconds() + LEAPSECONDS[23]
+    COMMONERAS[23].toAtomicSeconds() + LEAPSECONDS[23],
+    COMMONERAS[24].toAtomicSeconds() + LEAPSECONDS[24],
     //
     //  When another leap second occurs, insert a new entry
     //  here using the new values from the previous two tables.
