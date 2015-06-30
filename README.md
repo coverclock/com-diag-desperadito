@@ -1,7 +1,7 @@
 com-diag-desperadito
 ====================
 
-Copyright 2005-2014 Digital Aggregates Corporation, Colorado, USA.
+Copyright 2005-2015 Digital Aggregates Corporation, Colorado, USA.
 
 LICENSES
 
