@@ -57,7 +57,7 @@ It is licensed under a modified GNU Lesser General Public License to allow it
 to be incorporated into proprietary software or firmware without restriction or
 viral licensing implication.
 
-Contact:
+CONTACT
 
     Chip Overclock
     Digital Aggregates Corporation
